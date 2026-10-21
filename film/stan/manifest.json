@@ -1,0 +1,10 @@
+{
+ "broj": 60,
+ "segmenti": [
+  {
+   "faza": "Obilazak stana",
+   "od": 0,
+   "do": 59
+  }
+ ]
+}

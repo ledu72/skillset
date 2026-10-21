@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="sr-Latn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MASSIV ressidence, Zlatibor | Skillset</title>
+<meta name="description" content="MASSIV ressidence na Zlatiboru: apart hotel sa 4 zvezde i 52 stana. Pogledajte lokaciju, gradnju i stanove u ponudi kompanije Skillset.">
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=switzer@400,500,600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="nav">
+  <a class="logo" href="#" data-home>SKILLSET</a>
+  <p class="mono crumb" id="crumb">Srbija</p>
+  <a class="mono ghost" href="tel:+381655505555">065 550 5555</a>
+</header>
+
+<main class="stage" data-scene="srbija">
+
+  <!-- 1. Karta Srbije -->
+  <section class="scene scene-srbija" aria-label="Mapa Srbije">
+    <div class="svg-wrap" id="srbija"></div>
+    <div class="intro">
+      <p class="mono">Skillset · lokacije</p>
+      <h1>Izaberite<br>gde živite.</h1>
+      <p class="lead">Kliknite na lokaciju na mapi.</p>
+      <ul class="loc-list" id="locList"></ul>
+    </div>
+  </section>
+
+  <!-- 2. Film uz skrol: let do parcele + gradnja -->
+  <section class="scene scene-film" aria-label="Let do parcele i gradnja">
+    <canvas id="film"></canvas>
+    <div class="shade"></div>
+    <div class="hud">
+      <p class="mono">MASSIV ressidence · Zlatibor, Bele vode</p>
+      <h2 id="faza"></h2>
+      <ol class="faze" id="faze"></ol>
+    </div>
+    <div class="progress"><span id="bar"></span></div>
+    <p class="mono hint" id="hint">Skrolujte ↓</p>
+    <p class="mono note">Vizualizacija</p>
+  </section>
+
+  <!-- 3. Gotova zgrada: mere na fasadi, klik na ulaz -->
+  <section class="scene scene-zgrada" aria-label="Fasada sa merama">
+    <div class="z-wrap">
+      <img class="z-bg" src="za-ai/05-kraj-gotova-zgrada.jpg" alt="" aria-hidden="true">
+      <img src="za-ai/05-kraj-gotova-zgrada.jpg" alt="MASSIV ressidence, fasada" id="zImg">
+      <svg id="zSvg" viewBox="0 0 1740 980" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><g id="units"></g></svg>
+    </div>
+    <div class="shade"></div>
+    <div class="z-head">
+      <p class="mono">MASSIV ressidence</p>
+      <h2>Pređite mišem preko<br>prozora i terasa.</h2>
+      <p class="lead">Kliknite na ulazna vrata da uđete u zgradu.</p>
+    </div>
+    <p class="mono note">Vizualizacija · mere su približne</p>
+  </section>
+
+  <!-- 4. Prolaz kroz ulaz (kadrovi ide sami) -->
+  <section class="scene scene-ulaz" aria-label="Ulaz u zgradu">
+    <canvas id="ulazCanvas"></canvas>
+  </section>
+
+  <!-- 5. Lift: izbor sprata i stana -->
+  <section class="scene scene-lift" aria-label="Lift">
+    <img class="lift-bg" src="za-ai/07-lift.png" alt="Unutrašnjost lifta">
+    <div class="lift-vrata" id="liftVrata"><span></span><span></span></div>
+    <div class="lift-panel">
+      <p class="lift-displej" id="liftDisplej">P</p>
+      <div class="lift-dugmad" id="liftDugmad"></div>
+    </div>
+    <aside class="lift-stanovi" id="liftStanovi" hidden></aside>
+    <div class="lift-head"><p class="mono">Lift · MASSIV ressidence</p><h2>Izaberite sprat.</h2></div>
+    <button class="mono back" data-zgrada>← Izađi iz zgrade</button>
+  </section>
+
+  <!-- 4. Obilazak stana -->
+  <section class="scene scene-stan" aria-label="Obilazak stana">
+    <canvas id="stanCanvas"></canvas>
+    <img class="stan-img" id="stanA" src="za-ai/02_apartment_3d.png" alt="3D prikaz stana">
+    <img class="stan-img" id="stanB" src="za-ai/03_apartment_living.png" alt="Dnevna soba stana">
+    <div class="shade"></div>
+    <div class="hud">
+      <p class="mono" id="stanNaziv">MASSIV ressidence · stan</p>
+      <h2 id="stanFaza">Osnova stana</h2>
+    </div>
+    <div class="progress"><span id="stanBar"></span></div>
+    <button class="mono back" data-lift>← Nazad u lift</button>
+    <a class="btn btn-solid cta" href="tel:+381655505555">Zakažite razgledanje ↗</a>
+    <p class="mono note">Vizualizacija</p>
+  </section>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>

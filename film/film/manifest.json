@@ -1,0 +1,35 @@
+{
+ "broj": 355,
+ "segmenti": [
+  {
+   "faza": "Srbija → Zlatibor",
+   "od": 0,
+   "do": 59
+  },
+  {
+   "faza": "Parcela",
+   "od": 60,
+   "do": 118
+  },
+  {
+   "faza": "Iskop i temelji",
+   "od": 119,
+   "do": 177
+  },
+  {
+   "faza": "Konstrukcija",
+   "od": 178,
+   "do": 236
+  },
+  {
+   "faza": "Fasada",
+   "od": 237,
+   "do": 295
+  },
+  {
+   "faza": "Završeno",
+   "od": 296,
+   "do": 354
+  }
+ ]
+}
