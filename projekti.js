@@ -184,21 +184,38 @@ const PROJEKTI = {
   },
   /* Veselina Masleše 51, Voždovac (Lekino brdo): 1459,69 m², 10 stanova, 14 garaža, lokal. Mere su procena sa rendera. */
   vmaslese: {
-    posle: [['p/vmaslese/gal/g1.jpg','Zgrada iz ulice'],['p/vmaslese/gal/g2.jpg','Dvorište'],['p/vmaslese/gal/g3.jpg','Krovna terasa'],['p/vmaslese/kraj.jpg','Veselina Masleše 51']],   // slike posle gradnje, pre fasade
+    posle: [['p/vmaslese/gal/g1.jpg','Detalj fasade'],['p/vmaslese/gal/g2.jpg','Dvorište'],['p/vmaslese/gal/g3.jpg','Krovna terasa'],['p/vmaslese/kraj.jpg','Veselina Masleše 51']],   // slike posle gradnje, pre fasade
     naziv: 'Veselina Masleše 51', mesto: 'Beograd', adresa: 'Veselina Masleše 51, Lekino brdo · Voždovac · useljivo',
-    film: 'p/vmaslese/film/film', kraj: 'p/vmaslese/kraj.jpg', w: 1600, h: 900, mobX: 35,
+    film: 'p/vmaslese/film/film', kraj: 'p/vmaslese/kraj.jpg', w: 1600, h: 900, mobX: 45,
     fasada: () => [
-      R('Krovna terasa sa pergolom', 160, 0, 688, 144, 'Povučeni sprat', 'zelena krovna terasa'),
-      R('Francuski balkon', 328, 184, 448, 376, '3. sprat', '1,4 × 2,2 m · procena'), R('Francuski balkon', 328, 424, 448, 616, '2. sprat', '1,4 × 2,2 m · procena'), R('Francuski balkon', 328, 656, 448, 848, '1. sprat', '1,4 × 2,2 m · procena'),
-      R('Prozor', 528, 136, 613, 256, '3. sprat', '1,2 × 1,4 m · procena'), R('Prozor', 528, 384, 613, 501, '2. sprat', '1,2 × 1,4 m · procena'), R('Prozor', 528, 632, 613, 747, '1. sprat', '1,2 × 1,4 m · procena'),
-      R('Balkon', 704, 192, 840, 312, '3. sprat', '1,8 × 1,0 m · procena'), R('Balkon', 704, 456, 840, 568, '2. sprat', '1,8 × 1,0 m · procena'), R('Balkon', 704, 717, 840, 824, '1. sprat', '1,8 × 1,0 m · procena'),
-      R('Prozor', 968, 35, 1069, 168, '3. sprat', '1,3 × 1,6 m · procena'), R('Prozor', 968, 307, 1069, 435, '2. sprat', '1,3 × 1,6 m · procena'), R('Prozor', 968, 579, 1069, 704, '1. sprat', '1,3 × 1,6 m · procena'),
-      R('Izlog lokala', 1253, 717, 1352, 832, 'Prizemlje', 'lokal prema ulici'),
-      R('Glavni ulaz', 1392, 699, 1504, 840, 'Prizemlje', 'kliknite za ulaz')],
-    pin: [1448, 690], dugmad: [['PS', 4], ['3', 3], ['2', 2], ['1', 1], ['P', 0], ['-1', -1]],
+      R('Krovna terasa sa pergolom', 580, 60, 1060, 200, 'Povučeni sprat', 'zelena krovna terasa'),
+      R('Francuski balkon', 602, 265, 672, 365, '4. sprat', '1,4 × 2,2 m · procena'),
+      R('Francuski balkon', 602, 382, 672, 482, '3. sprat', '1,4 × 2,2 m · procena'),
+      R('Francuski balkon', 602, 500, 672, 600, '2. sprat', '1,4 × 2,2 m · procena'),
+      R('Francuski balkon', 618, 620, 670, 710, '1. sprat', '1,2 × 2,2 m · procena'),
+      R('Prozor', 713, 240, 765, 300, '4. sprat', '1,2 × 1,4 m · procena'),
+      R('Prozor', 713, 362, 765, 422, '3. sprat', '1,2 × 1,4 m · procena'),
+      R('Prozor', 713, 487, 765, 547, '2. sprat', '1,2 × 1,4 m · procena'),
+      R('Prozor', 720, 612, 770, 667, '1. sprat', '1,2 × 1,4 m · procena'),
+      R('Prozor', 550, 285, 588, 340, '4. sprat', '0,9 × 1,4 m · procena'),
+      R('Prozor', 550, 400, 588, 453, '3. sprat', '0,9 × 1,4 m · procena'),
+      R('Prozor', 550, 515, 588, 568, '2. sprat', '0,9 × 1,4 m · procena'),
+      R('Prozor', 550, 628, 588, 678, '1. sprat', '0,9 × 1,4 m · procena'),
+      R('Prozor', 818, 223, 862, 285, '4. sprat', '1,0 × 1,4 m · procena'),
+      R('Prozor', 818, 350, 862, 410, '3. sprat', '1,0 × 1,4 m · procena'),
+      R('Prozor', 818, 475, 862, 535, '2. sprat', '1,0 × 1,4 m · procena'),
+      R('Prozor', 818, 603, 862, 660, '1. sprat', '1,0 × 1,4 m · procena'),
+      R('Balkon', 923, 195, 1008, 308, '4. sprat', '1,8 × 1,0 m · procena'),
+      R('Balkon', 923, 328, 1008, 440, '3. sprat', '1,8 × 1,0 m · procena'),
+      R('Balkon', 923, 460, 1008, 572, '2. sprat', '1,8 × 1,0 m · procena'),
+      R('Balkon', 933, 590, 1000, 697, '1. sprat', '1,6 × 1,0 m · procena'),
+      R('Izlog lokala', 565, 738, 692, 840, 'Prizemlje', 'lokal prema ulici'),
+      R('Ulaz u garažu', 900, 765, 1033, 860, 'Prizemlje', '14 garažnih mesta'),
+      R('Glavni ulaz', 740, 715, 877, 855, 'Prizemlje', 'prolaz u dvorište · kliknite za ulaz')],
+    pin: [808, 780], dugmad: [['PS', 5], ['4', 4], ['3', 3], ['2', 2], ['1', 1], ['P', 0], ['-1', -1]],
     sprat: sp => sp === -1 ? { info: ['Podzemna garaža', '14 garažnih mesta', 'Garaža za stanare sa ulazom iz ulice.'] }
-      : sp === 0 ? galerija('vmaslese', 'Prizemlje · zgrada spolja', 'Fasada, dvorište i krovna terasa', ['Fasada iz ulice', 'Dvorište zgrade', 'Krovna terasa'])
-      : { naslov: (sp === 4 ? 'Povučeni sprat' : sp + '. sprat') + ' · useljivo', stanovi: [{ id: 'enterijer', naziv: 'Završen stan', opis: '10 stanova · ukupno 1459,69 m²', slike: [['p/vmaslese/gal/g4.jpg', 'Kuhinja i trpezarija'], ['p/vmaslese/gal/g5.jpg', 'Spavaća soba'], ['p/vmaslese/gal/g6.jpg', 'Terasa'], ['p/vmaslese/gal/g7.jpg', 'Kupatilo']] }] },
+      : sp === 0 ? galerija('vmaslese', 'Prizemlje · zgrada spolja', 'Fasada, dvorište i krovna terasa', ['Detalj fasade', 'Dvorište zgrade', 'Krovna terasa'])
+      : { naslov: (sp === 5 ? 'Povučeni sprat' : sp + '. sprat') + ' · useljivo', stanovi: [{ id: 'enterijer', naziv: 'Završen stan', opis: '10 stanova · ukupno 1459,69 m²', slike: [['p/vmaslese/gal/g4.jpg', 'Kuhinja i trpezarija'], ['p/vmaslese/gal/g5.jpg', 'Spavaća soba'], ['p/vmaslese/gal/g6.jpg', 'Terasa'], ['p/vmaslese/gal/g7.jpg', 'Kupatilo']] }] },
     tura: turaSlike
   },
   francuska: {
