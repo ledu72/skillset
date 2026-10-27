@@ -101,6 +101,7 @@ const galerija = (dir, naslov, opis, imena) => ({ naslov, stanovi: [{ id: 'gal',
 
 const PROJEKTI = {
   zlatibor: {
+    posle: [['p/zlatibor/gal/g2.jpg','Fasada u zelenilu'],['p/zlatibor/gal/g4.jpg','Ugao sa ulazom'],['p/zlatibor/gal/g5.jpg','Ulaz sa logom MASSIV'],['p/zlatibor/gal/g6.jpg','Bočna strana i parking'],['za-ai/05-kraj-gotova-zgrada.jpg','MASSIV ressidence']],   // slike posle gradnje, pre fasade
     naziv: 'MASSIV ressidence', mesto: 'Zlatibor', adresa: 'Zlatibor, Bele vode',
     film: 'film/film', ulaz: 'film/ulaz', uvod: 'p/zlatibor/uvod/uglovi.mp4',   // zgrada iz svih uglova pre gradnje
     kraj: 'za-ai/05-kraj-gotova-zgrada.jpg', w: 1740, h: 980, mobX: 45.4,
@@ -117,6 +118,7 @@ const PROJEKTI = {
     tura: s => s.slike ? turaSlike(s) : ({ klip: 'film/stan', slike: [['za-ai/02_apartment_3d.png', 'Osnova stana u 3D'], ['za-ai/03_apartment_living.png', 'Dnevna soba']] })
   },
   lestane: {
+    posle: [['p/lestane/gal/g1.jpg','Pogled sa ulice'],['p/lestane/gal/g2.jpg','Ulaz i parking'],['p/lestane/gal/g3.jpg','Bočna fasada'],['p/lestane/gal/g4.jpg','Zgrada u naselju'],['p/lestane/kraj.jpg','Leštane Residence']],   // slike posle gradnje, pre fasade
     naziv: 'Leštane Residence', mesto: 'Leštane', adresa: 'Leštane, Grocka · Beograd',
     film: 'p/lestane/film/film',
     kraj: 'p/lestane/kraj.jpg', w: 1920, h: 1080, mobX: 57,
@@ -129,6 +131,7 @@ const PROJEKTI = {
     tura: s => s.slike ? turaSlike(s) : ({ slike: [[`p/lestane/stan/karta-${s.t.k}.jpg`, 'Osnova stana'], [`p/lestane/stan/3d-${s.t.k}.jpg`, 'Stan u 3D'], [`p/lestane/stan/dnevna-${s.t.k}.jpg`, 'Dnevni boravak']], info: `${s.t.tip} · ${m2f(s.t.m2)} m² neto` })
   },
   visnjica: {
+    posle: [['p/visnjica/gal/g1.jpg','Pogled iz ulice'],['p/visnjica/gal/g2.jpg','Ugao zgrade'],['p/visnjica/gal/g3.jpg','Fasada sa terasama'],['p/visnjica/kraj.jpg','Višnjica Residence']],   // slike posle gradnje, pre fasade
     naziv: 'Višnjica Residence', mesto: 'Višnjica', adresa: 'Ramadanska ulica, Višnjica · Palilula',
     film: 'p/visnjica/film/film',
     kraj: 'p/visnjica/kraj.jpg', w: 1760, h: 983, mobX: 39,
@@ -141,6 +144,7 @@ const PROJEKTI = {
     tura: s => s.slike ? turaSlike(s) : ({ slike: V_TURA[s.tip].map(([f, n]) => f === '3d' ? [`p/visnjica/stan/3d-${s.id}.jpg`, 'Stan u 3D · ilustracija'] : [`p/visnjica/stan/${f}.jpg`, n]), info: `${s.tip} · ${m2f(s.m2)} m² neto` })
   },
   kopaonik: {
+    posle: [['p/kopaonik/gal/g1.jpg','Pogled sa puta'],['p/kopaonik/gal/g2.jpg','Zgrada u šumi'],['p/kopaonik/gal/g4.jpg','Fasada sa terasama'],['p/kopaonik/gal/g5.jpg','Bočni pogled'],['p/kopaonik/kraj.jpg','MASSIV Kopaonik']],   // slike posle gradnje, pre fasade
     naziv: 'MASSIV Kopaonik', mesto: 'Kopaonik', adresa: 'Kopaonik · apart hotel 4*, vikend naselje',
     film: 'p/kopaonik/film/film', kraj: 'p/kopaonik/kraj.jpg', w: 1600, h: 900, mobX: 52,
     fasada: () => [
@@ -165,6 +169,7 @@ const PROJEKTI = {
     tura: turaSlike
   },
   podujevska: {
+    posle: [['p/podujevska/stan/e01.jpg','Podujevska 17 i 19'],['p/podujevska/stan/e02.jpg','Parking ispred zgrade'],['p/podujevska/stan/e03.jpg','Dvorište i parking'],['p/podujevska/stan/e04.jpg','Zgrada iz ulice'],['p/podujevska/kraj.jpg','Useljivo']],   // slike posle gradnje, pre fasade
     naziv: 'Podujevska 17 i 19', mesto: 'Beograd', adresa: 'Podujevska 17 i 19, Beograd · useljivo',
     film: 'p/podujevska/film/film', kraj: 'p/podujevska/kraj.jpg', w: 1600, h: 900, mobX: 40,
     fasada: () => [
@@ -179,6 +184,7 @@ const PROJEKTI = {
   },
   /* Veselina Masleše 51, Voždovac (Lekino brdo): 1459,69 m², 10 stanova, 14 garaža, lokal. Mere su procena sa rendera. */
   vmaslese: {
+    posle: [['p/vmaslese/gal/g1.jpg','Zgrada iz ulice'],['p/vmaslese/gal/g2.jpg','Dvorište'],['p/vmaslese/gal/g3.jpg','Krovna terasa'],['p/vmaslese/kraj.jpg','Veselina Masleše 51']],   // slike posle gradnje, pre fasade
     naziv: 'Veselina Masleše 51', mesto: 'Beograd', adresa: 'Veselina Masleše 51, Lekino brdo · Voždovac · useljivo',
     film: 'p/vmaslese/film/film', kraj: 'p/vmaslese/kraj.jpg', w: 1600, h: 900, mobX: 35,
     fasada: () => [
@@ -196,6 +202,7 @@ const PROJEKTI = {
     tura: turaSlike
   },
   francuska: {
+    posle: [['p/francuska/stan/p01.jpg','Obnovljeni podovi i zidovi'],['p/francuska/stan/p02.jpg','Galerija sa ogradom'],['p/francuska/stan/p03.jpg','Svečana sala'],['p/francuska/stan/p04.jpg','Obnovljeni enterijer'],['p/francuska/kraj.jpg','Francuska 21']],   // slike posle gradnje, pre fasade
     naziv: 'Spomen dom Nikole Pašića', mesto: 'Beograd', adresa: 'Francuska 21, Beograd · rekonstrukcija 2017–2021',
     film: 'p/francuska/film/film', kraj: 'p/francuska/kraj.jpg', w: 1600, h: 900, mobX: 50,
     fasada: () => [

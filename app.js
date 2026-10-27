@@ -196,7 +196,7 @@ function uFilm() {
   scena('film', `Srbija → ${P.mesto}`); F.film.velicina(); F.film.p = F.film.target = 0; uvod(true);
   F.film.ready.then(() => { if (!F.film.N) uZgradu(); else F.film.crtaj(); });   // bez filma odmah na zgradu
 }
-function uZgradu() { uvod(false); scena('zgrada', `${P.mesto} → ${P.naziv}`); }
+function uZgradu() { uvod(false); posle(false, true); scena('zgrada', `${P.mesto} → ${P.naziv}`); }
 function uStan(s) {
   TURA = P.tura(s);
   F.stan = NizKadrova(TURA.klip, $('stanCanvas')); F.stan.onDraw = hudStana;
@@ -286,18 +286,50 @@ document.querySelector('[data-home]').addEventListener('click', e => {
 });
 
 /* ---------- Skrol (točkić, dodir, tastatura) ---------- */
+/* ---------- Posle gradnje: prave fotografije i renderi menjaju se na skrol ---------- */
+const POSLE = { on: false, q: 0, cilj: 0, n: 1, run: false };
+const posleBox = $('posle');
+POSLE.crtaj = () => {
+  const im = posleBox.querySelectorAll('img'), n = im.length, pos = POSLE.q * (n - 1 + .999);
+  im.forEach((el, i) => {
+    const t = pos - i;                                  // <0 još nije, 0..1 aktivna, >1 prošla
+    const op = t < -1 ? 0 : t < 0 ? 1 + t : 1;          // sledeća se pretapa preko prethodne
+    el.style.opacity = op.toFixed(3);
+    el.style.transform = 'scale(' + (1.12 - .1 * Math.min(1, Math.max(0, (t + 1) / 2))).toFixed(4) + ')';
+    el.style.zIndex = i;
+  });
+  const cur = Math.min(n - 1, Math.max(0, Math.round(pos - .3)));
+  $('posleNaslov').textContent = P.posle[cur]?.[1] || '';
+  $('posleBroj').textContent = (cur + 1) + ' / ' + n;
+  $('bar').style.width = '100%';
+};
+POSLE.idi = c => { POSLE.cilj = Math.min(1, Math.max(0, c)); if (POSLE.run) return; POSLE.run = true;
+  const k = () => { POSLE.q += (POSLE.cilj - POSLE.q) * .12; if (Math.abs(POSLE.cilj - POSLE.q) < .0005) POSLE.q = POSLE.cilj; POSLE.crtaj(); if (POSLE.q !== POSLE.cilj) requestAnimationFrame(k); else POSLE.run = false; }; requestAnimationFrame(k); };
+function posle(ukljuci, tiho) {
+  if (ukljuci) {
+    if (posleBox.dataset.p !== P.naziv) { posleBox.querySelector('.posle-slike').innerHTML = P.posle.map(([src, alt]) => '<img src="' + src + '" alt="' + alt + '">').join(''); posleBox.dataset.p = P.naziv; }
+    POSLE.n = P.posle.length; POSLE.on = true; POSLE.q = POSLE.cilj = 0; posleBox.hidden = false; requestAnimationFrame(() => posleBox.classList.add('on')); POSLE.crtaj();
+  } else if (POSLE.on) {
+    POSLE.on = false; posleBox.classList.remove('on'); setTimeout(() => { if (!POSLE.on) posleBox.hidden = true; }, tiho ? 0 : 600);
+  }
+}
 let lock = 0;
 function pomeri(d) {
   const s = stage.dataset.scene, now = performance.now();
   if (s === 'film') {
     const f = F.film;
     if (!$('uvod').parentElement.hidden && !$('uvod').parentElement.classList.contains('gone')) { if (d > 0 && now - lock > 700) { lock = now; uvod(false); } return; }
-    if (f.target >= 1 && d > 0) { if (now - lock > 700) { lock = now; uZgradu(); } return; }
+    if (POSLE.on) {                                   // slike posle gradnje: skrol ih menja, kraj vodi na zgradu
+      if (POSLE.q >= 1 && d > 0) { if (now - lock > 700) { lock = now; uZgradu(); } return; }
+      if (POSLE.q <= 0 && d < 0) { posle(false); return; }
+      POSLE.idi(POSLE.q + d * 1.8 / POSLE.n); return;
+    }
+    if (f.target >= 1 && d > 0) { if (now - lock > 700) { lock = now; if (P.posle?.length && f.p > .99) posle(true); else uZgradu(); } return; }
     if (f.target <= 0 && d < 0) return;
     f.idi(f.target + d * (f.N ? 120 / f.N : 1));
   } else if (s === 'zgrada') {
     if (now - lock < 700) return; lock = now;
-    if (d < 0 && F.film.N) { scena('film', `Srbija → ${P.mesto}`); F.film.crtaj(); }   // nadole nema dalje: u zgradu se ulazi klikom na vrata
+    if (d < 0 && F.film.N) { scena('film', `Srbija → ${P.mesto}`); F.film.crtaj(); if (P.posle?.length) { posle(true); POSLE.q = POSLE.cilj = 1; POSLE.crtaj(); } }   // nadole nema dalje: u zgradu se ulazi klikom na vrata
   } else if (s === 'stan') {
     const st = F.stan;
     if (st.target <= 0 && d < 0) { if (now - lock > 700) { lock = now; pokaziLift(); } return; }

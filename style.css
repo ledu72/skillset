@@ -229,3 +229,14 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
 .firma-btn.ghost{display:inline-block}
 @media(max-width:640px){.nav-r .firma-btn{padding:8px 12px;font-size:11px}}
 @media(max-width:760px){.firma-box{grid-template-columns:1fr;gap:16px;justify-items:center}.firma video{height:62vh}.firma-txt{text-align:center}.firma-txt h2{font-size:28px}.firma-txt p{font-size:14px}}
+
+/* Posle gradnje: slike se menjaju na skrol, pa sledi fasada sa merama */
+.posle{position:absolute;inset:0;z-index:2;background:#0b0b0a;opacity:0;transition:opacity .6s ease}
+.posle.on{opacity:1}
+.posle-slike{position:absolute;inset:0;overflow:hidden}
+.posle-slike img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;will-change:opacity,transform}
+.posle:after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,#0b0b0acc 0%,#0b0b0a00 45%);pointer-events:none;z-index:50}
+.posle-hud{position:absolute;left:clamp(20px,4vw,56px);bottom:clamp(70px,10vh,110px);z-index:60;color:#fff}
+.posle-hud h2{font-size:clamp(30px,4.6vw,64px);font-weight:500;letter-spacing:-.04em;line-height:1;margin-top:10px}
+.posle-hint{position:absolute;right:clamp(20px,4vw,56px);bottom:clamp(28px,5vh,46px);z-index:60;color:#ffffffb3;font-size:12px}
+@media(max-width:640px){.posle-hint{left:20px;right:auto;font-size:10px}}
