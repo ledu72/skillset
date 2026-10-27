@@ -92,7 +92,13 @@
     <line x1="676.2" y1="725.3" x2="746.2" y2="785.3"/>
     <text class="n" x="756.2" y="789.3" text-anchor="start">Leštane</text>
     <text class="s" x="756.2" y="811.3" text-anchor="start">Leštane Residence</text>
-  </g></g>
+  </g><g class="pin" id="pin-visnjica" data-status="predprodaja">
+    <circle cx="671.7" cy="685.8" r="22" fill="#3f85ce" fill-opacity=".15"/>
+    <circle cx="671.7" cy="685.8" r="8" fill="#3f85ce" stroke="#0b0b0a" stroke-width="3"/>
+    <line x1="671.7" y1="685.8" x2="741.7" y2="560.8"/>
+    <text class="n" x="751.7" y="564.8" text-anchor="start">Višnjica</text>
+    <text class="s" x="751.7" y="586.8" text-anchor="start">Višnjica Residence</text>
+  </g><g class="pin" id="pin-park"><circle cx="940" cy="1099.6" r="22" fill="#d6a85c" fill-opacity=".15"/><circle cx="940" cy="1099.6" r="8" fill="#d6a85c" stroke="#0b0b0a" stroke-width="3"/><line x1="940" y1="1099.6" x2="1010" y2="1109.6"/><text class="n" x="1020" y="1113.6" text-anchor="start">Ćuprija</text><text class="s" x="1020" y="1135.6" text-anchor="start">NT 035 naučno-tehnološki park</text></g><g class="pin" id="pin-vmaslese"><circle cx="646.4" cy="700.8" r="22" fill="#6fd08c" fill-opacity=".15"/><circle cx="646.4" cy="700.8" r="8" fill="#6fd08c" stroke="#0b0b0a" stroke-width="3"/><line x1="646.4" y1="700.8" x2="716.4" y2="770.8"/><text class="n" x="726.4" y="774.8" text-anchor="start">Veselina Masleše 51</text><text class="s" x="726.4" y="796.8" text-anchor="start">Voždovac · useljivo</text></g><g class="pin" id="pin-podujevska"><circle cx="647.3" cy="698.3" r="22" fill="#6fd08c" fill-opacity=".15"/><circle cx="647.3" cy="698.3" r="8" fill="#6fd08c" stroke="#0b0b0a" stroke-width="3"/><line x1="647.3" y1="698.3" x2="577.3" y2="758.3"/><text class="n" x="567.3" y="762.3" text-anchor="end">Podujevska</text><text class="s" x="567.3" y="784.3" text-anchor="end">Podujevska 17 i 19</text></g><g class="pin" id="pin-francuska"><circle cx="637.2" cy="686" r="22" fill="#6fd08c" fill-opacity=".15"/><circle cx="637.2" cy="686" r="8" fill="#6fd08c" stroke="#0b0b0a" stroke-width="3"/><line x1="637.2" y1="686" x2="567.2" y2="626"/><text class="n" x="557.2" y="630" text-anchor="end">Francuska 21</text><text class="s" x="557.2" y="652" text-anchor="end">Spomen dom Nikole Pašića</text></g></g>
 <text class="label-country" x="883.3" y="1241.9">SRBIJA</text>
 <text class="meta" x="40" y="2068">Skillset · lokacije projekata</text>
 <text class="meta" x="1560" y="2068" text-anchor="end">Izvor: Natural Earth, geoBoundaries</text>

@@ -7,17 +7,30 @@
 <meta name="description" content="MASSIV ressidence na Zlatiboru: apart hotel sa 4 zvezde i 52 stana. Pogledajte lokaciju, gradnju i stanove u ponudi kompanije Skillset.">
 <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=switzer@400,500,600&display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400&display=swap">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=1793019076">
 </head>
 <body>
 
 <header class="nav">
   <a class="logo" href="#" data-home>SKILLSET</a>
   <p class="mono crumb" id="crumb">Srbija</p>
-  <a class="mono ghost" href="tel:+381655505555">065 550 5555</a>
+  <div class="nav-r"><button class="mono ghost firma-btn" type="button" data-firma>O firmi ▶</button><a class="mono ghost" href="tel:+381655505555">065 550 5555</a></div>
 </header>
 
+<div class="firma" id="firma" hidden role="dialog" aria-modal="true" aria-label="Skillset, video o firmi">
+  <div class="firma-box">
+    <video id="firmaVideo" src="p/firma/skillset-firma.mp4" poster="p/firma/poster.jpg" controls playsinline preload="none"></video>
+    <div class="firma-txt">
+      <p class="mono">Skillset · homes for respect</p>
+      <h2>Gradimo domove<br>sa poštovanjem.</h2>
+      <p>Beogradska kompanija koja gradi stambene zgrade od Senjaka i Vračara do Zlatibora i Kopaonika. Svaki projekat sa ovog sajta je naš.</p>
+      <button class="mono ghost" type="button" data-firma-close>Zatvori ✕</button>
+    </div>
+  </div>
+</div>
+
 <main class="stage" data-scene="srbija">
+  <p class="mono znak" aria-hidden="true">www.skillset.rs</p>
 
   <!-- 1. Karta Srbije -->
   <section class="scene scene-srbija" aria-label="Mapa Srbije">
@@ -33,15 +46,16 @@
   <!-- 2. Film uz skrol: let do parcele + gradnja -->
   <section class="scene scene-film" aria-label="Let do parcele i gradnja">
     <canvas id="film"></canvas>
+    <div class="uvod" hidden><video id="uvod" muted loop playsinline preload="none" aria-label="Zgrada iz svih uglova"></video><p class="mono uvod-hint">Zgrada iz svih uglova · skrolujte ↓ da vidite gradnju</p></div>
     <div class="shade"></div>
     <div class="hud">
-      <p class="mono">MASSIV ressidence · Zlatibor, Bele vode</p>
+      <p class="mono" id="filmNaslov">MASSIV ressidence · Zlatibor, Bele vode</p>
       <h2 id="faza"></h2>
       <ol class="faze" id="faze"></ol>
     </div>
     <div class="progress"><span id="bar"></span></div>
     <p class="mono hint" id="hint">Skrolujte ↓</p>
-    <p class="mono note">Vizualizacija</p>
+    <p class="mono note">Vizualizacija · satelit: Esri World Imagery</p>
   </section>
 
   <!-- 3. Gotova zgrada: mere na fasadi, klik na ulaz -->
@@ -53,8 +67,8 @@
     </div>
     <div class="shade"></div>
     <div class="z-head">
-      <p class="mono">MASSIV ressidence</p>
-      <h2>Pređite mišem preko<br>prozora i terasa.</h2>
+      <p class="mono" data-p-naziv>MASSIV ressidence</p>
+      <h2><span class="na-pc">Pređite mišem preko</span><span class="na-tel">Dodirnite</span><br>prozore i terase.</h2>
       <p class="lead">Kliknite na ulazna vrata da uđete u zgradu.</p>
     </div>
     <p class="mono note">Vizualizacija · mere su približne</p>
@@ -74,19 +88,19 @@
       <div class="lift-dugmad" id="liftDugmad"></div>
     </div>
     <aside class="lift-stanovi" id="liftStanovi" hidden></aside>
-    <div class="lift-head"><p class="mono">Lift · MASSIV ressidence</p><h2>Izaberite sprat.</h2></div>
+    <div class="lift-head"><p class="mono">Lift · <span data-p-naziv>MASSIV ressidence</span></p><h2>Izaberite sprat.</h2></div>
     <button class="mono back" data-zgrada>← Izađi iz zgrade</button>
   </section>
 
   <!-- 4. Obilazak stana -->
   <section class="scene scene-stan" aria-label="Obilazak stana">
     <canvas id="stanCanvas"></canvas>
-    <img class="stan-img" id="stanA" src="za-ai/02_apartment_3d.png" alt="3D prikaz stana">
-    <img class="stan-img" id="stanB" src="za-ai/03_apartment_living.png" alt="Dnevna soba stana">
+    <div id="stanSlike"></div>
     <div class="shade"></div>
     <div class="hud">
       <p class="mono" id="stanNaziv">MASSIV ressidence · stan</p>
       <h2 id="stanFaza">Osnova stana</h2>
+      <p class="mono stan-info" id="stanInfo"></p>
     </div>
     <div class="progress"><span id="stanBar"></span></div>
     <button class="mono back" data-lift>← Nazad u lift</button>
@@ -95,6 +109,7 @@
   </section>
 </main>
 
-<script src="app.js"></script>
+<script src="projekti.js?v=1793019076"></script>
+<script src="app.js?v=1793019076"></script>
 </body>
 </html>

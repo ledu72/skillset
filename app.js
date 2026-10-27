@@ -1,35 +1,57 @@
-/* MASSIV ressidence: sajt u stilu "film na skrol"
-   1. karta Srbije → 2. let do parcele + gradnja (AI kadrovi) → 3. gotova zgrada, hover na stan → 4. obilazak stana
+/* Skillset: sajt u stilu "film na skrol", isti tok za svaki projekat (podaci u projekti.js)
+   1. karta Srbije → 2. let do parcele + gradnja (AI kadrovi) → 3. gotova zgrada, mere na fasadi → ulaz → lift → obilazak stana
    Kadrovi se prave skriptom tools/build-film.js iz klipova u za-ai/. */
 
 const LOKACIJE = [
-  { id: 'zlatibor', naziv: 'Zlatibor', status: 'predprodaja', aktivno: true },
-  { id: 'kopaonik', naziv: 'Kopaonik', status: 'useljivo' },
-  { id: 'beograd', naziv: 'Beograd', status: 'useljivo' },
-  { id: 'lestane', naziv: 'Leštane', status: 'izgradnja' }
+  { id: 'zlatibor', naziv: 'Zlatibor', status: 'predprodaja' },
+  { id: 'lestane', naziv: 'Leštane', status: 'izgradnja' },
+  { id: 'visnjica', naziv: 'Višnjica', status: 'predprodaja' },
+  { id: 'kopaonik', naziv: 'Kopaonik', status: 'predprodaja' },
+  { id: 'park', naziv: 'Ćuprija', status: 'izgradnja' },
+  { id: 'podujevska', naziv: 'Podujevska', status: 'useljivo' },
+  { id: 'francuska', naziv: 'Francuska 21', status: 'useljivo' },
+  { id: 'vmaslese', naziv: 'Veselina Masleše 51', status: 'useljivo' },
+  { id: 'beograd', naziv: 'Beograd', status: 'useljivo' }
 ];
 const STATUS = { useljivo: 'Useljivo', izgradnja: 'U izgradnji', predprodaja: 'Predprodaja' };
+const $ = id => document.getElementById(id);
 
 const stage = document.querySelector('.stage');
-const crumb = document.getElementById('crumb');
-const scena = (s, c) => { stage.dataset.scene = s; crumb.textContent = c; };
+const crumb = $('crumb');
+// prelaz bez crnog međukadra: stara scena ostaje cela ispod dok nova ne izađe preko nje
+let prelaz;
+const scena = (s, c) => {
+  const stara = stage.querySelector('.scene-' + stage.dataset.scene), nova = stage.querySelector('.scene-' + s);
+  if (stara && stara !== nova) {
+    stage.querySelectorAll('.scene').forEach(x => { x.classList.remove('ispod'); x.style.zIndex = ''; });
+    stara.classList.add('ispod'); nova.style.zIndex = 2;
+    clearTimeout(prelaz); prelaz = setTimeout(() => { stara.classList.remove('ispod'); nova.style.zIndex = ''; }, 1050);
+  }
+  stage.dataset.scene = s; crumb.textContent = c;
+};
+
+let P = null;          // trenutni projekat
+let F = {};            // nizovi kadrova trenutnog projekta: film, stan, ulaz
 
 /* ---------- 1. Karta Srbije ---------- */
-const wrap = document.getElementById('srbija');
+const wrap = $('srbija');
 let svg;
 fetch('mapa-srbije.svg').then(r => r.text()).then(t => {
   wrap.innerHTML = t;
   svg = wrap.querySelector('svg');
   svg.removeAttribute('width'); svg.removeAttribute('height');
   LOKACIJE.forEach(l => svg.querySelector('#pin-' + l.id)?.addEventListener('click', () => izaberi(l)));
+  const h = location.hash.slice(1);
+  if (PROJEKTI[h]) izaberi(LOKACIJE.find(l => l.id === h));
 });
-const list = document.getElementById('locList');
-list.innerHTML = LOKACIJE.map(l => `<li><button data-id="${l.id}">${l.naziv}<small><i class="dot dot-${l.status}"></i>${l.aktivno ? STATUS[l.status] : 'Uskoro'}</small></button></li>`).join('');
+const list = $('locList');
+list.innerHTML = LOKACIJE.map(l => `<li><button data-id="${l.id}">${l.naziv}<small><i class="dot dot-${l.status}"></i>${PROJEKTI[l.id] ? STATUS[l.status] : 'Uskoro'}</small></button></li>`).join('');
 list.addEventListener('click', e => { const b = e.target.closest('button'); if (b) izaberi(LOKACIJE.find(l => l.id === b.dataset.id)); });
 list.addEventListener('mouseover', e => { const b = e.target.closest('button'); svg?.querySelectorAll('.pin').forEach(p => p.classList.toggle('on', b && p.id === 'pin-' + b.dataset.id)); });
 
 function izaberi(l) {
-  if (!svg || !l.aktivno) return;
+  if (!svg || !PROJEKTI[l.id]) return;
+  postaviProjekat(l.id);
   const dot = svg.querySelector(`#pin-${l.id} circle:nth-child(2)`);
   const cx = +dot.getAttribute('cx'), cy = +dot.getAttribute('cy');
   const f = [0, 0, 1600, 2108], w = 120, h = w * f[3] / f[2], to = [cx - w / 2, cy - h / 2, w, h];
@@ -38,22 +60,24 @@ function izaberi(l) {
   const step = now => {
     const p = ease(Math.min(1, (now - t0) / D));
     svg.setAttribute('viewBox', f.map((v, i) => v + (to[i] - v) * p).join(' '));
-    if (p < 1) requestAnimationFrame(step); else { uFilm(); }
+    if (p < 1) requestAnimationFrame(step); else F.film.prvi.then(uFilm);   // film tek kad stigne prvi kadar, da ne bude prazan ekran
   };
   requestAnimationFrame(step);
-  Film.film.ucitaj();
+  F.film.ucitaj();
 }
 
 /* ---------- Niz kadrova vezan za skrol ---------- */
-function NizKadrova(dir, canvas) {
-  const o = { dir, canvas, ctx: canvas.getContext('2d'), frames: [], N: 0, seg: [], p: 0, target: 0, run: false, ready: null, onDraw: null };
-  o.ready = fetch(`film/${dir}/manifest.json`).then(r => r.json()).then(m => { o.N = m.broj; o.seg = m.segmenti; }).catch(() => {});
+function NizKadrova(base, canvas) {
+  const o = { canvas, ctx: canvas.getContext('2d'), frames: [], N: 0, seg: [], p: 0, target: 0, run: false, ready: null, onDraw: null };
+  o.ready = base ? fetch(`${base}/manifest.json`).then(r => r.json()).then(m => { o.N = m.broj; o.seg = m.segmenti; }).catch(() => {}) : Promise.resolve();
+  let gotov; o.prvi = new Promise(r => gotov = r); o.ready.then(() => { if (!o.N) gotov(); });
   o.ucitaj = () => o.ready.then(() => {
     if (o.frames.length || !o.N) return;
-    for (let i = 1; i <= o.N; i++) { const im = new Image(); im.onload = () => { if (i === 1) o.crtaj(); }; im.src = `film/${dir}/f_${String(i).padStart(4, '0')}.jpg`; o.frames.push(im); }
+    for (let i = 1; i <= o.N; i++) { const im = new Image(); im.onload = () => { if (i === 1) { o.crtaj(); gotov(); } }; im.src = `${base}/f_${String(i).padStart(4, '0')}.jpg`; o.frames.push(im); }
   });
   o.velicina = () => { const d = Math.min(devicePixelRatio || 1, 2); canvas.width = innerWidth * d; canvas.height = innerHeight * d; o.crtaj(); };
   o.crtaj = () => {
+    if (!Object.values(F).includes(o)) return;              // samo nizovi trenutnog projekta crtaju
     if (!o.N) return o.onDraw?.(o);
     const idx = Math.round(o.p * (o.N - 1));
     let im = o.frames[idx];
@@ -62,26 +86,22 @@ function NizKadrova(dir, canvas) {
       const c = canvas;
       // odzumiranje tokom gradnje: kadar kreće krupno i polako se udaljava dok zgrada raste
       const z = o.zoom ? o.zoom(idx) : { k: 1, cx: .5, cy: .5 };
-      const s = Math.max(c.width / im.naturalWidth, c.height / im.naturalHeight) * z.k, w = im.naturalWidth * s, h = im.naturalHeight * s;
+      // telefon (uspravno): kadar preko celog ekrana, bez dodatnog zuma
+      const port = c.height > c.width;
+      const base = Math.max(c.width / im.naturalWidth, c.height / im.naturalHeight);
+      const s = base * (port ? 1 : z.k), w = im.naturalWidth * s, h = im.naturalHeight * s;
       o.ctx.fillStyle = '#0b0b0a'; o.ctx.fillRect(0, 0, c.width, c.height);
       // pomeraj ograničen tako da nikad ne ostane prazna traka
-      const x = Math.min(0, Math.max(c.width - w, c.width / 2 - w * z.cx));
-      let y = Math.min(0, Math.max(c.height - h, c.height / 2 - h * z.cy));
+      const x = Math.min(0, Math.max(c.width - w, c.width / 2 - w * (port ? P.mobX / 100 : z.cx)));
+      let y = port ? 0 : Math.min(0, Math.max(c.height - h, c.height / 2 - h * z.cy));
       o.ctx.drawImage(im, x, y, w, h);
       // kraj filma: pretapanje u pravi render, cela zgrada u kadru (kao scena izbora), sa zamućenim nastavkom sa strane
-      const end = document.getElementById('zImg');
-      if (z.fit && end.complete && end.naturalWidth) {
-        const t = z.fit, ar = end.naturalWidth / end.naturalHeight;
-        const nav = (innerWidth >= 768 ? 76 : 64) * (c.width / innerWidth), ah = c.height - nav;
-        let cw = c.width, ch = cw / ar; if (ch > ah) { ch = ah; cw = ch * ar; }
-        const cx2 = (c.width - cw) / 2, cy2 = nav + (ah - ch) / 2;
-        o.ctx.globalAlpha = t;
-        o.ctx.filter = 'blur(30px) brightness(.55)';
-        o.ctx.drawImage(end, x, y, w, w / ar);
-        o.ctx.filter = 'none';
-        const rw = w + (cw - w) * t;
-        o.ctx.globalAlpha = Math.min(1, t * 1.6);
-        o.ctx.drawImage(end, x + (cx2 - x) * t, y + (cy2 - y) * t, rw, rw / ar);
+      const end = $('zImg');
+      // kraj filma: pretapanje u oštru fotografiju gotove zgrade preko celog ekrana (isti kadar kao sledeća scena)
+      if (z.fit && !port && end.complete && end.naturalWidth) {
+        const es = Math.max(c.width / end.naturalWidth, c.height / end.naturalHeight), ew = end.naturalWidth * es, eh = end.naturalHeight * es;
+        o.ctx.globalAlpha = z.fit;
+        o.ctx.drawImage(end, (c.width - ew) / 2, (c.height - eh) / 2, ew, eh);
         o.ctx.globalAlpha = 1;
       }
     }
@@ -92,101 +112,127 @@ function NizKadrova(dir, canvas) {
   addEventListener('resize', o.velicina);
   return o;
 }
-const Film = {
-  film: NizKadrova('film', document.getElementById('film')),
-  stan: NizKadrova('stan', document.getElementById('stanCanvas')),
-  ulaz: NizKadrova('ulaz', document.getElementById('ulazCanvas'))
-};
 
-/* Odzumiranje tokom gradnje (od prvog kadra "Iskop" do kraja): 1.45× → 1×,
-   centar se pomera sa temelja (dole) na celu zgradu */
-Film.film.zoom = idx => {
-  const seg = Film.film.seg, start = seg.find(s => /Iskop/.test(s.faza))?.od ?? 0, end = Film.film.N - 1;
+/* Odzumiranje tokom gradnje (od prvog kadra "Iskop" do kraja):
+   kreće krupno na temeljima (dole), pa se kamera penje i udaljava dok ne uhvati vrh zgrade;
+   na kraju (fit → 1) kadar je identičan slici gotove zgrade u sledećoj sceni */
+function zoomGradnje(idx) {
+  const seg = F.film.seg, start = seg.find(s => /Iskop|Konstrukcija|Rekonstrukcija/.test(s.faza))?.od ?? 0, end = F.film.N - 1;
+  if (idx < start && /dron|lokacij/i.test(seg[0]?.faza)) return { k: 1, cx: .5, cy: .5, fit: 0 };   // satelit i dron bez dodatnog zuma
   const t = Math.max(0, Math.min(1, (idx - start) / Math.max(1, end - start)));
   const e = 1 - Math.pow(1 - t, 2);
-  // kreće krupno na temeljima (dole), pa se kamera penje i udaljava dok ne uhvati vrh zgrade
-  // na kraju (fit → 1) kadar je identičan slici gotove zgrade u sledećoj sceni: ceo kadar, vrh odmah ispod menija
   return { k: 1.18 - .18 * e, cx: .5, cy: .66 - .38 * e, fit: Math.max(0, (e - .75) / .25) };
-};
+}
 
 /* HUD za film */
-Film.film.ready.then(() => { document.getElementById('faze').innerHTML = Film.film.seg.map(s => `<li>${s.faza}</li>`).join(''); });
-Film.film.onDraw = o => {
+function hudFilma(o) {
   const idx = Math.round(o.p * (o.N - 1));
   const si = Math.max(0, o.seg.findIndex(s => idx >= s.od && idx <= s.do));
-  const f = document.getElementById('faza');
+  const f = $('faza');
   if (o.seg[si] && f.textContent !== o.seg[si].faza) f.textContent = o.seg[si].faza;
   document.querySelectorAll('#faze li').forEach((li, i) => { li.classList.toggle('on', i === si); li.classList.toggle('done', i < si); });
-  document.getElementById('bar').style.width = (o.p * 100).toFixed(1) + '%';
-  document.getElementById('hint').textContent = o.p > .99 ? 'Skrolujte dalje za izbor stana ↓' : o.p < .01 ? 'Skrolujte ↓' : 'Skrol gore vraća unazad ↑';
-};
+  $('bar').style.width = (o.p * 100).toFixed(1) + '%';
+  $('hint').textContent = o.p > .99 ? 'Skrolujte dalje do zgrade ↓' : o.p < .01 ? 'Skrolujte ↓' : 'Skrol gore vraća unazad ↑';
+}
 
-/* Stan: ako nema klipa, prelaz između dve slike */
-Film.stan.onDraw = o => {
-  document.getElementById('stanBar').style.width = (o.p * 100).toFixed(1) + '%';
-  document.getElementById('stanFaza').textContent = o.p < .5 ? 'Osnova stana u 3D' : 'Dnevna soba';
-  const nemaKlipa = !o.N;
-  document.getElementById('stanA').style.opacity = nemaKlipa ? String(1 - Math.min(1, Math.max(0, (o.p - .3) / .4))) : 0;
-  document.getElementById('stanB').style.opacity = nemaKlipa ? String(Math.min(1, Math.max(0, (o.p - .3) / .4))) : 0;
-  if (nemaKlipa) document.getElementById('stanB').style.transform = `scale(${1.08 - o.p * .08})`;
-};
+/* Obilazak stana: klip ako postoji, inače pretapanje kroz slike stana */
+let TURA = { slike: [] };
+function hudStana(o) {
+  $('stanBar').style.width = (o.p * 100).toFixed(1) + '%';
+  const sl = TURA.slike, n = sl.length, imgs = $('stanSlike').children;
+  const klip = !!o.N;
+  if (klip) { $('stanFaza').textContent = o.p < .5 ? sl[0]?.[1] || '' : sl[1]?.[1] || ''; [...imgs].forEach(i => i.style.opacity = 0); return; }
+  // prelaz kao ulazak u sobu: trenutna slika se uvećava ka sredini i nestaje, sledeća se otvara iz blagog uvećanja
+  const pos = o.p * (n - 1), cur = Math.min(n - 1, Math.floor(pos)), t = pos - cur, e = t * t * (3 - 2 * t);
+  [...imgs].forEach((im, i) => {
+    let op = 0, sc = 1;
+    if (i === cur) { op = 1 - Math.max(0, (e - .45) / .55); sc = 1 + e * 1.4; }
+    else if (i === cur + 1) { op = Math.min(1, Math.max(0, (e - .35) / .5)); sc = 1.25 - .25 * e; }
+    im.style.opacity = op.toFixed(3);
+    im.style.transform = 'scale(' + sc.toFixed(3) + ')';
+    im.style.zIndex = i === cur ? 2 : 1;
+  });
+  $('stanFaza').textContent = sl[Math.round(pos)]?.[1] || '';
+}
 
-function uFilm() { scena('film', 'Srbija → Zlatibor'); Film.film.velicina(); Film.film.p = Film.film.target = 0; Film.film.crtaj(); }
-function uZgradu() { scena('zgrada', 'Zlatibor → MASSIV'); }
-function uStan() { Film.stan.ucitaj(); scena('stan', 'MASSIV → Stan'); Film.stan.velicina(); Film.stan.p = Film.stan.target = 0; Film.stan.crtaj(); }
+/* ---------- Izbor projekta ---------- */
+let tip;
+function postaviProjekat(id) {
+  if (P === PROJEKTI[id]) return;
+  P = PROJEKTI[id];
+  history.replaceState(null, '', '#' + id);
+  F = {
+    film: NizKadrova(P.film, $('film')),
+    stan: NizKadrova(null, $('stanCanvas')),
+    ulaz: NizKadrova(P.ulaz, $('ulazCanvas'))
+  };
+  F.film.zoom = zoomGradnje;
+  F.film.onDraw = hudFilma;
+  F.stan.onDraw = hudStana;
+  F.film.ready.then(() => { $('faze').innerHTML = F.film.seg.map(s => `<li>${s.faza}</li>`).join(''); });
+  document.title = `${P.naziv}, ${P.mesto} | Skillset`;
+  document.querySelectorAll('[data-p-naziv]').forEach(e => e.textContent = P.naziv);
+  $('filmNaslov').textContent = `${P.naziv} · ${P.adresa}`;
+  // gotova zgrada
+  const zw = document.querySelector('.z-wrap');
+  zw.style.setProperty('--ar', `${P.w} / ${P.h}`);
+  zw.style.setProperty('--mx', `-${P.mobX}%`);
+  zw.querySelector('.z-bg').src = P.kraj;
+  $('zImg').src = P.kraj; $('zImg').alt = `${P.naziv}, fasada`;
+  $('zSvg').setAttribute('viewBox', `0 0 ${P.w} ${P.h}`);
+  $('zSvg').setAttribute('preserveAspectRatio', 'xMidYMid slice');   // isto sečenje kao slika (cover)
+  P.el = P.fasada();
+  $('units').innerHTML = P.el.map((e, i) => `<rect class="el ${e.tip === 'Glavni ulaz' ? 'el-ulaz' : ''}" data-i="${i}" x="${e.x0}" y="${e.y0}" width="${e.x1 - e.x0}" height="${e.y1 - e.y0}" rx="2"/>`).join('')
+    + `<g class="ulaz-pin" transform="translate(${P.pin[0]} ${P.pin[1]})"><circle r="16"/><circle r="6"/><text y="-26" text-anchor="middle">UĐI</text></g>`;
+}
 
-/* ---------- 3. Gotova zgrada: dimenzije na fasadi + ulaz ----------
-   Koordinate su u pikselima rendera 05 (1740×980). Mere su PRIBLIŽNE, procenjene iz vizualizacije
-   (fasada ~34 m ≈ 850 px → ~0,04 m po pikselu). Zameniti tačnim merama iz projekta. */
-const MPX = .04;
-const m = v => (Math.round(v * 10) / 10).toFixed(1).replace('.', ',');
-const SPRATOVI = [[60, 150], [150, 237], [237, 326], [326, 416], [416, 506], [506, 597], [597, 692]];   // od 7. do 1. sprata
-const ELEMENTI = [];
-const dodaj = (tip, x0, y0, x1, y1, sprat, mere) => ELEMENTI.push({ tip, x0, y0, x1, y1, sprat, mere });
-SPRATOVI.forEach(([y0, y1], i) => {
-  const sp = 7 - i, h = y1 - y0;
-  // tamni delovi sa terasama: [x0, x1, pomeraj nadole (perspektiva desnog krila)]
-  for (const [x0, x1, dy] of [[385, 476, 0], [683, 771, 0], [914, 996, 0], [1143, 1212, 20]]) {
-    const w = (x1 - x0) * MPX;
-    dodaj('Balkonska vrata', x0 + 6, y0 + dy + 10, x1 - 6, y0 + dy + h * .62, sp, `${m(w - .6)} × 2,3 m`);
-    dodaj('Terasa', x0, y0 + dy + h * .62, x1, y1 + dy - 2, sp, `${m(w)} × 1,6 m · ${m(w * 1.6)} m²`);
-  }
-  // prozori: [x0, x1, pomeraj]
-  for (const [x0, x1, dy] of [[497, 528, 0], [539, 571, 0], [606, 656, 0], [1003, 1041, 6], [1071, 1096, 20], [1101, 1125, 20]])
-    dodaj('Prozor', x0, y0 + dy + 18, x1, y0 + dy + 18 + 50, sp, `${m((x1 - x0) * MPX)} × 1,5 m`);
-  dodaj('Francuski prozor', 802, y0 + 14, 884, y1 - 22, sp, `${m(82 * MPX)} × 2,1 m`);
-});
-// prizemlje
-dodaj('Glavni ulaz', 788, 698, 852, 780, 0, '2,4 × 2,6 m · kliknite za ulaz');
-for (const [x0, y0, x1, y1] of [[682, 712, 746, 790], [917, 704, 976, 782], [1082, 700, 1136, 776], [598, 712, 646, 760]])
-  dodaj('Izlog poslovnog prostora', x0, y0, x1, y1, 0, `${m((x1 - x0) * MPX)} × ${m((y1 - y0) * MPX)} m`);
+/* Uvodni video (npr. zgrada iz svih uglova) pre filma gradnje; prvi skrol ga sklanja */
+function uvod(pokazi) {
+  const v = $('uvod'), box = v.parentElement;
+  if (pokazi && P.uvod) { v.src = P.uvod; v.currentTime = 0; v.play().catch(() => {}); box.hidden = false; box.classList.remove('gone'); }
+  else if (!box.hidden) { box.classList.add('gone'); v.pause(); setTimeout(() => { box.hidden = true; }, 700); }
+}
+function uFilm() {
+  scena('film', `Srbija → ${P.mesto}`); F.film.velicina(); F.film.p = F.film.target = 0; uvod(true);
+  F.film.ready.then(() => { if (!F.film.N) uZgradu(); else F.film.crtaj(); });   // bez filma odmah na zgradu
+}
+function uZgradu() { uvod(false); scena('zgrada', `${P.mesto} → ${P.naziv}`); }
+function uStan(s) {
+  TURA = P.tura(s);
+  F.stan = NizKadrova(TURA.klip, $('stanCanvas')); F.stan.onDraw = hudStana;
+  $('stanSlike').innerHTML = TURA.slike.map(([src, alt]) => `<img class="stan-img${/karta|3d|apartment_3d/.test(src) ? ' stan-cela' : ''}" src="${src}" alt="${alt}">`).join('');
+  $('stanNaziv').textContent = `${P.naziv} · ${s.naziv}`;
+  $('stanInfo').textContent = TURA.info || '';
+  scena('stan', `${P.naziv} → ${s.naziv}`);
+  F.stan.ready.then(() => { F.stan.ucitaj(); F.stan.velicina(); F.stan.p = F.stan.target = 0; F.stan.crtaj(); });
+}
 
-const unitsG = document.getElementById('units');
-unitsG.innerHTML = ELEMENTI.map((e, i) => `<rect class="el ${e.tip === 'Glavni ulaz' ? 'el-ulaz' : ''}" data-i="${i}" x="${e.x0}" y="${e.y0}" width="${e.x1 - e.x0}" height="${e.y1 - e.y0}" rx="2"/>`).join('')
-  + `<g class="ulaz-pin" transform="translate(820 690)"><circle r="16"/><circle r="6"/><text y="-26" text-anchor="middle">UĐI</text></g>`;
-
-const tip = document.createElement('div');
+/* ---------- 3. Gotova zgrada: dimenzije na fasadi + ulaz ---------- */
+const unitsG = $('units');
+tip = document.createElement('div');
 tip.className = 'tip'; tip.hidden = true; document.body.appendChild(tip);
 unitsG.addEventListener('mousemove', ev => {
   const r = ev.target.closest('.el');
   unitsG.querySelectorAll('.el.on').forEach(x => x !== r && x.classList.remove('on'));
   if (!r) { tip.hidden = true; return; }
   r.classList.add('on');
-  const e = ELEMENTI[r.dataset.i];
-  tip.innerHTML = `<b>${e.tip}</b><span>${e.sprat ? e.sprat + '. sprat · ' : 'Prizemlje · '}${e.mere}</span>`;
+  const e = P.el[r.dataset.i];
+  tip.innerHTML = `<b>${e.tip}</b><span>${e.sprat} · ${e.mere}</span>`;
   tip.style.left = ev.clientX + 'px'; tip.style.top = ev.clientY + 'px'; tip.hidden = false;
 });
 unitsG.addEventListener('mouseleave', () => { tip.hidden = true; unitsG.querySelectorAll('.el.on').forEach(x => x.classList.remove('on')); });
 unitsG.addEventListener('click', ev => {
   const r = ev.target.closest('.el-ulaz, .ulaz-pin');
-  if (r) { tip.hidden = true; uLift(); }
+  if (r) { tip.hidden = true; uLift(); return; }
+  // telefon: dodir na prozor/terasu prikazuje mere (nema hover-a)
+  const el = ev.target.closest('.el');
+  if (el) el.dispatchEvent(new MouseEvent('mousemove', { clientX: ev.clientX, clientY: ev.clientY, bubbles: true }));
 });
 
 /* ---------- 4. Ulaz → lift ---------- */
-const SPRAT_STANOVI = sp => ['A', 'B', 'C', 'D'].map(o => ({ id: `${sp}${o}`, status: 'slobodan' }));   // zameniti spiskom od klijenta
 function uLift() {
-  scena('ulaz', 'MASSIV → Ulaz');
-  const ul = Film.ulaz;
+  scena('ulaz', `${P.naziv} → Ulaz`);
+  const ul = F.ulaz;
   ul.ready.then(() => {
     if (!ul.N) return pokaziLift();
     ul.ucitaj(); ul.velicina(); ul.p = ul.target = 0; ul.crtaj();
@@ -194,39 +240,49 @@ function uLift() {
     const cek = setInterval(() => { if (ul.p >= .999) { clearInterval(cek); pokaziLift(); } }, 100);
   });
 }
+const oznaka = sp => P.dugmad.find(d => d[1] === sp)?.[0] ?? sp;
 function pokaziLift() {
-  scena('lift', 'MASSIV → Lift');
-  const pan = document.getElementById('liftDugmad');
-  pan.innerHTML = [7, 6, 5, 4, 3, 2, 1].map(sp => `<button data-sprat="${sp}">${sp}</button>`).join('') + '<button data-sprat="0">P</button>';
-  document.getElementById('liftStanovi').hidden = true;
-  document.getElementById('liftDisplej').textContent = 'P';
+  scena('lift', `${P.naziv} → Lift`);
+  const pan = $('liftDugmad');
+  pan.innerHTML = P.dugmad.map(([t, sp]) => `<button data-sprat="${sp}">${t}</button>`).join('');
+  $('liftStanovi').hidden = true;
+  $('liftDisplej').textContent = oznaka(0);
+  $('liftDisplej').dataset.sp = 0;
 }
-document.getElementById('liftDugmad').addEventListener('click', ev => {
+$('liftDugmad').addEventListener('click', ev => {
   const b = ev.target.closest('button'); if (!b) return;
   const sp = +b.dataset.sprat;
   document.querySelectorAll('#liftDugmad button').forEach(x => x.classList.toggle('on', x === b));
   // displej "vozi" do sprata
-  const d = document.getElementById('liftDisplej'); let cur = d.textContent === 'P' ? 0 : +d.textContent;
-  const korak = () => { if (cur === sp) return pokaziSprat(sp); cur += cur < sp ? 1 : -1; d.textContent = cur || 'P'; setTimeout(korak, 380); };
+  const d = $('liftDisplej'); let cur = +d.dataset.sp;
+  const korak = () => { d.dataset.sp = cur; d.textContent = oznaka(cur); if (cur === sp) return pokaziSprat(sp); cur += cur < sp ? 1 : -1; setTimeout(korak, 380); };
   korak();
 });
+let SPRAT = null;
 function pokaziSprat(sp) {
-  const box = document.getElementById('liftStanovi');
-  if (sp === 0) { box.hidden = false; box.innerHTML = '<p class="mono">Prizemlje</p><h3>Recepcija i poslovni prostor</h3><p class="lead">Lobi bar, recepcija apart hotela i lokali.</p>'; return; }
-  box.innerHTML = `<p class="mono">${sp}. sprat · izaberite stan</p><h3>Obilazak stanova</h3>` +
-    SPRAT_STANOVI(sp).map(s => `<button class="stan-row" data-stan-id="${s.id}"><span>Stan ${s.id}</span><small><i class="dot dot-useljivo"></i>${s.status === 'slobodan' ? 'Slobodan' : s.status} · obilazak ↗</small></button>`).join('');
+  const box = $('liftStanovi');
+  SPRAT = P.sprat(sp);
+  if (SPRAT.info) {
+    const [m, h, l] = SPRAT.info;
+    box.innerHTML = `<p class="mono">${m}</p><h3>${h}</h3><p class="lead">${l}</p>`;
+  } else {
+    box.innerHTML = `<p class="mono">${SPRAT.naslov}</p><h3>Obilazak stanova</h3>` +
+      SPRAT.stanovi.map((s, i) => `<button class="stan-row" data-i="${i}"><span>${s.naziv}</span><small><i class="dot dot-useljivo"></i>${s.opis} · obilazak ↗</small></button>`).join('');
+  }
   box.hidden = false;
 }
-document.getElementById('liftStanovi').addEventListener('click', ev => {
-  const b = ev.target.closest('[data-stan-id]'); if (!b) return;
-  const vrata = document.getElementById('liftVrata');
+$('liftStanovi').addEventListener('click', ev => {
+  const b = ev.target.closest('.stan-row'); if (!b) return;
+  const s = SPRAT.stanovi[+b.dataset.i];
+  const vrata = $('liftVrata');
   vrata.classList.add('open');                               // vrata lifta se otvaraju
-  setTimeout(() => { vrata.classList.remove('open'); document.getElementById('stanNaziv').textContent = `Stan ${b.dataset.stanId}`; uStan(); }, 1100);
+  setTimeout(() => { vrata.classList.remove('open'); uStan(s); }, 1100);
 });
 document.querySelector('[data-zgrada]').addEventListener('click', uZgradu);
 document.querySelector('[data-lift]').addEventListener('click', pokaziLift);
 document.querySelector('[data-home]').addEventListener('click', e => {
   e.preventDefault(); stage.classList.remove('zooming'); svg?.setAttribute('viewBox', '0 0 1600 2108'); scena('srbija', 'Srbija');
+  history.replaceState(null, '', location.pathname);
 });
 
 /* ---------- Skrol (točkić, dodir, tastatura) ---------- */
@@ -234,28 +290,37 @@ let lock = 0;
 function pomeri(d) {
   const s = stage.dataset.scene, now = performance.now();
   if (s === 'film') {
-    const f = Film.film;
+    const f = F.film;
+    if (!$('uvod').parentElement.hidden && !$('uvod').parentElement.classList.contains('gone')) { if (d > 0 && now - lock > 700) { lock = now; uvod(false); } return; }
     if (f.target >= 1 && d > 0) { if (now - lock > 700) { lock = now; uZgradu(); } return; }
     if (f.target <= 0 && d < 0) return;
-    f.idi(f.target + d * (Film.film.N ? 120 / Film.film.N : 1));
+    f.idi(f.target + d * (f.N ? 120 / f.N : 1));
   } else if (s === 'zgrada') {
     if (now - lock < 700) return; lock = now;
-    if (d < 0) { scena('film', 'Srbija → Zlatibor'); Film.film.crtaj(); }   // nadole nema dalje: u zgradu se ulazi klikom na vrata
+    if (d < 0 && F.film.N) { scena('film', `Srbija → ${P.mesto}`); F.film.crtaj(); }   // nadole nema dalje: u zgradu se ulazi klikom na vrata
   } else if (s === 'stan') {
-    const st = Film.stan;
+    const st = F.stan;
     if (st.target <= 0 && d < 0) { if (now - lock > 700) { lock = now; pokaziLift(); } return; }
-    st.idi(st.target + d * .9);
+    st.idi(st.target + d * (TURA.klip ? .9 : 2.4 / Math.max(1, TURA.slike.length - 1)));
   }
 }
 addEventListener('wheel', e => {
-  if (stage.dataset.scene === 'srbija') return;
+  if (stage.dataset.scene === 'srbija' || !document.getElementById('firma').hidden) return;
   e.preventDefault();
   pomeri(Math.sign(e.deltaY) * Math.min(Math.abs(e.deltaY), 120) / 1600);
 }, { passive: false });
 let ty = null;
 addEventListener('touchstart', e => { ty = e.touches[0].clientY; }, { passive: true });
-addEventListener('touchmove', e => { if (ty == null) return; const dy = ty - e.touches[0].clientY; ty = e.touches[0].clientY; if (Math.abs(dy) > 1) pomeri(dy / 1200); }, { passive: true });
+addEventListener('touchmove', e => { if (ty == null || !document.getElementById('firma').hidden) return; const dy = ty - e.touches[0].clientY; ty = e.touches[0].clientY; if (Math.abs(dy) > 1) pomeri(dy / 1200); }, { passive: true });
 addEventListener('keydown', e => {
   if (['ArrowDown', 'PageDown', ' '].includes(e.key)) pomeri(.04);
   if (['ArrowUp', 'PageUp'].includes(e.key)) pomeri(-.04);
 });
+
+/* ---------- Video o firmi ---------- */
+const firma = $('firma'), fv = $('firmaVideo');
+document.querySelector('[data-firma]').addEventListener('click', () => { firma.hidden = false; fv.currentTime = 0; fv.play().catch(() => {}); });
+const zatvoriFirmu = () => { fv.pause(); firma.hidden = true; };
+document.querySelector('[data-firma-close]').addEventListener('click', zatvoriFirmu);
+firma.addEventListener('click', e => { if (e.target === firma) zatvoriFirmu(); });
+addEventListener('keydown', e => { if (e.key === 'Escape' && !firma.hidden) zatvoriFirmu(); });
