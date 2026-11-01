@@ -1,0 +1,30 @@
+{
+ "broj": 568,
+ "segmenti": [
+  {
+   "faza": "Let do lokacije",
+   "od": 0,
+   "do": 142
+  },
+  {
+   "faza": "Iskop i temelji",
+   "od": 143,
+   "do": 236
+  },
+  {
+   "faza": "Zidovi i krovna konstrukcija",
+   "od": 237,
+   "do": 377
+  },
+  {
+   "faza": "Krov i fasada",
+   "od": 378,
+   "do": 472
+  },
+  {
+   "faza": "Bazen i dvorište",
+   "od": 473,
+   "do": 567
+  }
+ ]
+}

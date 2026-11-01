@@ -1,0 +1,30 @@
+{
+ "broj": 549,
+ "segmenti": [
+  {
+   "faza": "Let do lokacije",
+   "od": 0,
+   "do": 172
+  },
+  {
+   "faza": "Iskop i temelji",
+   "od": 173,
+   "do": 266
+  },
+  {
+   "faza": "Konstrukcija",
+   "od": 267,
+   "do": 360
+  },
+  {
+   "faza": "Fasada",
+   "od": 361,
+   "do": 454
+  },
+  {
+   "faza": "Završeno",
+   "od": 455,
+   "do": 548
+  }
+ ]
+}

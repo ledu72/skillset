@@ -1,0 +1,30 @@
+{
+ "broj": 604,
+ "segmenti": [
+  {
+   "faza": "Let do lokacije",
+   "od": 0,
+   "do": 172
+  },
+  {
+   "faza": "Let dronom",
+   "od": 173,
+   "do": 376
+  },
+  {
+   "faza": "Zgrada iz vazduha",
+   "od": 377,
+   "do": 485
+  },
+  {
+   "faza": "Rekonstrukcija",
+   "od": 486,
+   "do": 544
+  },
+  {
+   "faza": "Obnovljeno",
+   "od": 545,
+   "do": 603
+  }
+ ]
+}

@@ -1,0 +1,20 @@
+{
+ "broj": 291,
+ "segmenti": [
+  {
+   "faza": "Let do lokacije",
+   "od": 0,
+   "do": 172
+  },
+  {
+   "faza": "Konstrukcija",
+   "od": 173,
+   "do": 231
+  },
+  {
+   "faza": "Završeno",
+   "od": 232,
+   "do": 290
+  }
+ ]
+}
