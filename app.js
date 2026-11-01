@@ -10,6 +10,9 @@ const LOKACIJE = [
   { id: 'park', naziv: 'Ćuprija', status: 'izgradnja' },
   { id: 'podujevska', naziv: 'Podujevska', status: 'useljivo' },
   { id: 'francuska', naziv: 'Francuska 21', status: 'useljivo' },
+  { id: 'sumatovacka', naziv: 'Šumatovačka 155', status: 'useljivo' },
+  { id: 'avala', naziv: 'Avala house', status: 'useljivo' },
+  { id: 'kursumlijska', naziv: 'Kuršumlijska 3', status: 'useljivo' },
   { id: 'vmaslese', naziv: 'Veselina Masleše 51', status: 'useljivo' },
   { id: 'beograd', naziv: 'Beograd', status: 'useljivo' }
 ];
@@ -117,11 +120,13 @@ function NizKadrova(base, canvas) {
    kreće krupno na temeljima (dole), pa se kamera penje i udaljava dok ne uhvati vrh zgrade;
    na kraju (fit → 1) kadar je identičan slici gotove zgrade u sledećoj sceni */
 function zoomGradnje(idx) {
-  const seg = F.film.seg, start = seg.find(s => /Iskop|Konstrukcija|Rekonstrukcija/.test(s.faza))?.od ?? 0, end = F.film.N - 1;
+  const seg = F.film.seg, start = seg.find(s => /Iskop|Konstrukcija|Rekonstrukcija|Uređenje|Bazen/.test(s.faza))?.od ?? 0, end = F.film.N - 1;
   if (idx < start && /dron|lokacij/i.test(seg[0]?.faza)) return { k: 1, cx: .5, cy: .5, fit: 0 };   // satelit i dron bez dodatnog zuma
   const t = Math.max(0, Math.min(1, (idx - start) / Math.max(1, end - start)));
   const e = 1 - Math.pow(1 - t, 2);
-  return { k: 1.18 - .18 * e, cx: .5, cy: .66 - .38 * e, fit: Math.max(0, (e - .75) / .25) };
+  // Avala: poslednji klip se već pretapa u završni kadar, pa pravi render ulazi tek u poslednjih 8 kadrova (klip već završava na tom kadru)
+  const fit = seg.some(s => s.faza === 'Bazen i dvorište') ? Math.max(0, (idx - (end - 8)) / 8) : Math.max(0, (e - .75) / .25);
+  return { k: 1.18 - .18 * e, cx: .5, cy: .66 - .38 * e, fit };
 }
 
 /* HUD za film */
@@ -142,15 +147,40 @@ function hudStana(o) {
   const sl = TURA.slike, n = sl.length, imgs = $('stanSlike').children;
   const klip = !!o.N;
   if (klip) { $('stanFaza').textContent = o.p < .5 ? sl[0]?.[1] || '' : sl[1]?.[1] || ''; [...imgs].forEach(i => i.style.opacity = 0); return; }
-  // prelaz kao ulazak u sobu: trenutna slika se uvećava ka sredini i nestaje, sledeća se otvara iz blagog uvećanja
-  const pos = o.p * (n - 1), cur = Math.min(n - 1, Math.floor(pos)), t = pos - cur, e = t * t * (3 - 2 * t);
+  // hod kroz stan: kamera polako klizi kroz sobu, pa prolazi kroz nju (uvećanje i zamućenje) i izlazi u sledeću sobu
+  const pos = o.p * (n - 1), cur = Math.min(n - 1, Math.floor(pos)), t = pos - cur;
+  const HOD = .52, g = Math.max(0, (t - HOD) / (1 - HOD)), e = g * g * (3 - 2 * g);
+  const usko = innerHeight > innerWidth;
+  const kadar = (i, u) => {   // u: 0–1 kroz sobu; smer klizanja se smenjuje po sobi
+    if (imgs[i].classList.contains('stan-cela')) return { x: 0, sc: 1 + u * .03 };
+    if (usko) return { x: 0, sc: 1.02 + u * .03, poz: (i % 2 ? 80 - 60 * u : 20 + 60 * u).toFixed(1) };   // telefon: kamera se okreće preko širokog kadra
+    return { x: (i % 2 ? 1 : -1) * (u - .5) * 4, sc: 1.1 + u * .08 };
+  };
+  // vrata: prvo se krilo otvara, pa kamera prolazi kroz otvor koji se širi do celog ekrana
+  const pr = Math.max(0, (e - .45) / .55), p2 = pr * pr * pr, ot = Math.min(1, Math.max(0, (e - .15) / .3)), pri = Math.min(1, e / .45), ix = ((usko ? 22 : 39) - 5 * pri) * (1 - p2), iy = (12 - 4 * pri) * (1 - p2), hod = Math.sin(e * 18) * (1 - pr) * pri * .5;
+  const ima = e > 0 && cur + 1 < n && p2 < 1;
+  const vrata = $('stanVrata') || (() => {
+    const v = document.createElement('div'); v.id = 'stanVrata'; v.innerHTML = '<i></i>';
+    $('stanSlike').parentElement.appendChild(v); return v;
+  })();
+  vrata.hidden = !ima;
+  if (ima) {
+    vrata.style.inset = `${iy}% ${ix}% 0 ${ix}%`;
+    vrata.style.borderWidth = `${(14 * (1 - p2)).toFixed(1)}px ${(14 * (1 - p2)).toFixed(1)}px 0`;
+    vrata.style.opacity = Math.min(1, e / .1).toFixed(2);
+    vrata.firstChild.style.transform = `perspective(700px) rotateY(${(102 * ot * ot * (3 - 2 * ot)).toFixed(1)}deg)`;
+    vrata.firstChild.style.opacity = 1 - pr;
+  }
   [...imgs].forEach((im, i) => {
-    let op = 0, sc = 1;
-    if (i === cur) { op = 1 - Math.max(0, (e - .45) / .55); sc = 1 + e * 1.4; }
-    else if (i === cur + 1) { op = Math.min(1, Math.max(0, (e - .35) / .5)); sc = 1.25 - .25 * e; }
-    im.style.opacity = op.toFixed(3);
-    im.style.transform = 'scale(' + sc.toFixed(3) + ')';
-    im.style.zIndex = i === cur ? 2 : 1;
+    let op = 0, k = kadar(i, 0), dod = 1, clip = 'none';
+    if (i === cur) { k = kadar(i, Math.min(t / HOD, 1)); op = 1; dod = 1 + pri * .22 + p2 * 1.6; }
+    else if (i === cur + 1 && e > 0) { op = 1; dod = .9 + .1 * pr; clip = `inset(${iy}% ${ix}% 0 ${ix}%)`; }
+    im.style.opacity = op;
+    im.style.transform = `translate(${k.x.toFixed(2)}%, ${hod.toFixed(2)}%) scale(${(k.sc * dod).toFixed(3)})`;
+    im.style.objectPosition = k.poz ? `${k.poz}% 50%` : '';
+    im.style.clipPath = clip;
+    im.style.filter = i === cur && e > 0 ? `brightness(${(1 - .5 * pri).toFixed(2)})` : 'none';
+    im.style.zIndex = i === cur ? 2 : 3;
   });
   $('stanFaza').textContent = sl[Math.round(pos)]?.[1] || '';
 }
@@ -200,7 +230,7 @@ function uZgradu() { uvod(false); posle(false, true); scena('zgrada', `${P.mesto
 function uStan(s) {
   TURA = P.tura(s);
   F.stan = NizKadrova(TURA.klip, $('stanCanvas')); F.stan.onDraw = hudStana;
-  $('stanSlike').innerHTML = TURA.slike.map(([src, alt]) => `<img class="stan-img${/karta|3d|apartment_3d/.test(src) ? ' stan-cela' : ''}" src="${src}" alt="${alt}">`).join('');
+  $('stanSlike').innerHTML = TURA.slike.map(([src, alt]) => `<img class="stan-img${/karta|3d|apartment_3d|-cela/.test(src) ? ' stan-cela' : ''}" src="${src}" alt="${alt}">`).join('');
   $('stanNaziv').textContent = `${P.naziv} · ${s.naziv}`;
   $('stanInfo').textContent = TURA.info || '';
   scena('stan', `${P.naziv} → ${s.naziv}`);

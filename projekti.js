@@ -85,9 +85,10 @@ const V_STANOVI = {
   1: [[1, 'Dvosoban', 49.80], [2, 'Dvosoban', 58.46], [3, 'Dvosoban', 54.92], [4, 'Dvosoban', 63.32], [5, 'Dvosoban', 48.46], [6, 'Trosoban', 70.46], [7, 'Trosoban', 74.68]],
   3: [[15, 'Dvosoban', 44.58], [16, 'Dvosoban', 64.42, 'terasa 24,65 m²'], [17, 'Jednosoban', 37.15], [18, 'Dvosoban', 53.34], [19, 'Dvosoban', 44.26], [20, 'Trosoban', 57.84], [21, 'Trosoban', 69.14]]
 };
+const V_NOVE = new Set([1, 2, 3, 4, 5, 6, 7, 15, 16, 17, 18, 19, 20, 21]);   // stanovi sa sopstvenim sobama (p/visnjica/stan/vN-soba.jpg)
 const V_TURA = {
   Jednosoban: [['3d', 'Stan u 3D'], ['dnevna', 'Dnevni boravak'], ['kuhinja', 'Kuhinja'], ['kupatilo', 'Kupatilo']],
-  Dvosoban: [['3d', 'Stan u 3D'], ['dnevna', 'Dnevni boravak'], ['spavaca', 'Spavaća soba'], ['kupatilo', 'Kupatilo']],
+  Dvosoban: [['3d', 'Stan u 3D'], ['dnevna', 'Dnevni boravak'], ['kuhinja', 'Kuhinja'], ['spavaca', 'Spavaća soba'], ['kupatilo', 'Kupatilo']],
   Trosoban: [['3d', 'Stan u 3D'], ['dnevna', 'Dnevni boravak'], ['kuhinja', 'Kuhinja'], ['spavaca', 'Spavaća soba'], ['kupatilo', 'Kupatilo']]
 };
 
@@ -111,9 +112,9 @@ const PROJEKTI = {
       ? galerija('zlatibor', 'Prizemlje · recepcija i lokali', '7 prikaza zgrade', ['Fasada spreda', 'Fasada u zelenilu', 'Pogled na ulaz', 'Ugao sa ulazom', 'Ulaz MASSIV', 'Bočna strana i parking', 'Lokacija Zova'])
       // tipovi apartmana (raspored tipova po spratu: čeka podatke od investitora)
       : { naslov: `${sp}. sprat · tipovi apartmana`, stanovi: [
-          { id: `${sp}-studio`, naziv: 'Studio', opis: 'Studio apartman · ilustracija', slike: [['p/zlatibor/stan/tip-studio-3d.jpg', 'Studio u 3D · ilustracija'], ['p/zlatibor/stan/tip-studio-soba.jpg', 'Studio · enterijer']] },
-          { id: `${sp}-jedan`, naziv: 'Jednosoban · stan 3', opis: 'Jednosoban · 37,99 m² sa terasom', slike: [['p/zlatibor/stan/osnova-stan-3.jpg', 'Osnova stana 3 · 37,99 m²'], ['p/zlatibor/stan/02_apartment_3d.jpg', 'Stan u 3D'], ['p/zlatibor/stan/03_apartment_living.jpg', 'Dnevna soba']] },
-          { id: `${sp}-tro`, naziv: 'Trosoban', opis: 'Trosoban apartman · ilustracija', slike: [['p/zlatibor/stan/tip-trosoban-3d.jpg', 'Trosoban u 3D · ilustracija'], ['p/zlatibor/stan/tip-trosoban-dnevna.jpg', 'Trosoban · dnevna soba']] }
+          { id: `${sp}-studio`, naziv: 'Studio', opis: 'Studio apartman · ilustracija', slike: [['p/zlatibor/stan/z-studio.jpg', 'Studio (ilustracija)'], ['p/zlatibor/stan/z-studio-kupatilo.jpg', 'Kupatilo (ilustracija)'], ['p/zlatibor/stan/z-studio-terasa.jpg', 'Terasa (ilustracija)']] },
+          { id: `${sp}-jedan`, naziv: 'Jednosoban · stan 3', opis: 'Jednosoban · 37,99 m² sa terasom', slike: [['p/zlatibor/stan/z-jed-dnevna.jpg', 'Dnevna soba (ilustracija)'], ['p/zlatibor/stan/z-jed-kuhinja.jpg', 'Kuhinja (ilustracija)'], ['p/zlatibor/stan/z-jed-spavaca.jpg', 'Spavaća soba (ilustracija)'], ['p/zlatibor/stan/z-jed-kupatilo.jpg', 'Kupatilo (ilustracija)'], ['p/zlatibor/stan/z-jed-terasa.jpg', 'Terasa (ilustracija)']] },
+          { id: `${sp}-tro`, naziv: 'Trosoban', opis: 'Trosoban apartman · ilustracija', slike: [['p/zlatibor/stan/z-tro-dnevna.jpg', 'Dnevna soba (ilustracija)'], ['p/zlatibor/stan/z-tro-spavaca.jpg', 'Glavna spavaća soba (ilustracija)'], ['p/zlatibor/stan/z-tro-soba2.jpg', 'Druga soba (ilustracija)'], ['p/zlatibor/stan/z-tro-kupatilo.jpg', 'Kupatilo (ilustracija)'], ['p/zlatibor/stan/z-tro-terasa.jpg', 'Terasa (ilustracija)']] }
         ] },
     tura: s => s.slike ? turaSlike(s) : ({ klip: 'film/stan', slike: [['za-ai/02_apartment_3d.png', 'Osnova stana u 3D'], ['za-ai/03_apartment_living.png', 'Dnevna soba']] })
   },
@@ -128,7 +129,7 @@ const PROJEKTI = {
       : sp === -1 ? { info: ['Podrum', 'Garaža i ostave', 'Parking mesta i ostave za stanare.'] }
       : sp === 3 ? { info: ['Potkrovlje', 'Raspored uskoro', 'Stanovi u potkrovlju biće objavljeni uskoro. Pozovite za informacije.'] }
       : { naslov: `${sp}. sprat · izaberite stan`, stanovi: L_TIPOVI.map(t => ({ id: `${sp}.${t.br}`, naziv: `Stan ${t.br}`, opis: `${t.tip} · ${m2f(t.m2)} m²`, t })) },
-    tura: s => s.slike ? turaSlike(s) : ({ slike: [[`p/lestane/stan/karta-${s.t.k}.jpg`, 'Osnova stana'], [`p/lestane/stan/3d-${s.t.k}.jpg`, 'Stan u 3D'], [`p/lestane/stan/dnevna-${s.t.k}.jpg`, 'Dnevni boravak']], info: `${s.t.tip} · ${m2f(s.t.m2)} m² neto` })
+    tura: s => s.slike ? turaSlike(s) : ({ slike: [[`p/lestane/stan/dnevna-${s.t.k}.jpg`, 'Dnevni boravak'], ['p/lestane/stan/l-kuhinja.jpg', 'Kuhinja (ilustracija)'], [`p/lestane/stan/spavaca-${s.t.k}.jpg`, 'Spavaća soba (ilustracija)'], ...(s.t.tip === 'Dvosoban' ? [] : [['p/lestane/stan/l-soba2.jpg', 'Druga soba (ilustracija)']]), ['p/lestane/stan/l-kupatilo.jpg', 'Kupatilo (ilustracija)']], info: `${s.t.tip} · ${m2f(s.t.m2)} m² neto` })
   },
   visnjica: {
     posle: [['p/visnjica/gal/g1.jpg','Pogled iz ulice'],['p/visnjica/gal/g2.jpg','Ugao zgrade'],['p/visnjica/gal/g3.jpg','Fasada sa terasama'],['p/visnjica/kraj.jpg','Višnjica Residence']],   // slike posle gradnje, pre fasade
@@ -141,7 +142,7 @@ const PROJEKTI = {
       : sp === -2 ? { info: ['Nivo -2 · podrum', 'Garaža i bazen', 'Oko 15 parking mesta sa auto-liftom, ostave i bazen.'] }
       : sp === 2 ? { info: ['Nivo 2', 'Stanovi 8–14', 'Raspored nivoa 2 biće objavljen uskoro.'] }
       : { naslov: `Nivo ${sp}${sp === 3 ? ' · povučeni sprat' : ''} · izaberite stan`, stanovi: V_STANOVI[sp].map(([n, tip, m2, x]) => ({ id: String(n), naziv: `Stan ${n}`, opis: `${tip} · ${m2f(m2)} m²${x ? ' · ' + x : ''}`, tip, m2 })) },
-    tura: s => s.slike ? turaSlike(s) : ({ slike: V_TURA[s.tip].map(([f, n]) => f === '3d' ? [`p/visnjica/stan/3d-${s.id}.jpg`, 'Stan u 3D · ilustracija'] : [`p/visnjica/stan/${f}.jpg`, n]), info: `${s.tip} · ${m2f(s.m2)} m² neto` })
+    tura: s => s.slike ? turaSlike(s) : ({ slike: V_TURA[s.tip].filter(([f]) => f !== '3d').map(([f, n]) => [V_NOVE.has(+s.id) ? `p/visnjica/stan/n${s.id}-${f}.jpg` : `p/visnjica/stan/${f}.jpg`, n]), info: `${s.tip} · ${m2f(s.m2)} m² neto` })
   },
   kopaonik: {
     posle: [['p/kopaonik/gal/g1.jpg','Pogled sa puta'],['p/kopaonik/gal/g2.jpg','Zgrada u šumi'],['p/kopaonik/gal/g4.jpg','Fasada sa terasama'],['p/kopaonik/gal/g5.jpg','Bočni pogled'],['p/kopaonik/kraj.jpg','MASSIV Kopaonik']],   // slike posle gradnje, pre fasade
@@ -153,8 +154,16 @@ const PROJEKTI = {
       R('Krovni prozor sa terasom', 840, 460, 950, 550, '2. sprat', '2,2 × 1,8 m · procena'), R('Krovni prozor sa terasom', 1000, 480, 1100, 560, '2. sprat', '2,2 × 1,8 m · procena'),
       R('Glavni ulaz', 1010, 630, 1080, 690, 'Prizemlje', 'kliknite za ulaz')],
     pin: [1045, 620], dugmad: [['4', 4], ['3', 3], ['2', 2], ['1', 1], ['P', 0]],
-    sprat: sp => sp === 0 ? galerija('kopaonik', 'Prizemlje · recepcija', '7 prikaza iz prezentacije', ['Pogled sa puta', 'Zgrada u šumi', 'Apart hotel 4*', 'Fasada sa terasama', 'Bočni pogled', 'Kopaonik', 'Večernji pogled'])
-      : { naslov: sp + '. sprat · apartmani', ...jedanStan('kopaonik', 'Apartmani na prodaju', 'Raspored iz prodajne prezentacije', [['s1', 'Apartman u 3D'], ['s2', 'Osnova apartmana'], ['s4', 'Garaža u 3D']]) },
+    sprat: sp => {
+      const il = ' (ilustracija)', k = (f, t) => ['p/kopaonik/stan/' + f + '.jpg', t];
+      const sobe12 = [k('k12-dnevna', 'Dnevni boravak sa kuhinjom' + il), k('k12-spavaca-1', 'Glavna spavaća soba' + il), k('k12-spavaca-2', 'Druga spavaća soba' + il), k('k12-kupatilo', 'Kupatilo' + il)];
+      if (sp === 0) return { naslov: 'Prizemlje · recepcija', stanovi: [
+        { id: 'z', naziv: 'Zajednički prostori', opis: 'lobi, recepcija, wellness, sauna i garaža', slike: [k('kz-recepcija', 'Recepcija' + il), k('kz-lobi', 'Lobi i trpezarija' + il), k('kz-wellness', 'Wellness' + il), k('kz-sauna', 'Sauna' + il)] },
+        { id: '1.2', naziv: 'Stan 1.2 · 59,75 m²', opis: 'dve sobe, dnevni boravak sa kuhinjom', slike: sobe12 },
+        galerija('kopaonik', '', '7 prikaza iz prezentacije', ['Pogled sa puta', 'Zgrada u šumi', 'Apart hotel 4*', 'Fasada sa terasama', 'Bočni pogled', 'Kopaonik', 'Večernji pogled']).stanovi[0]] };
+      if (sp === 4) return { naslov: 'Potkrovlje · stanovi', stanovi: [{ id: 'PK2.6', naziv: 'Stan PK2.6 · 50,93 m²', opis: 'potkrovlje, dve sobe', slike: [k('k26-dnevna', 'Dnevni boravak sa trpezarijom i kuhinjom' + il), k('k26-spavaca', 'Spavaća soba' + il), k('k26-mala-soba', 'Mala soba' + il), k('k26-kupatilo', 'Kupatilo' + il)] }] };
+      return { naslov: sp + '. sprat · stanovi', stanovi: [{ id: 'PK1.4', naziv: 'Stan PK1.4 · 59,05 m²', opis: 'isti raspored kao stan 1.2', slike: sobe12 }] };
+    },
     tura: turaSlike
   },
   park: {
@@ -228,6 +237,64 @@ const PROJEKTI = {
       R('Glavni ulaz', 890, 80, 1200, 630, 'Prizemlje', 'stakleni paviljon · kliknite za ulaz')],
     pin: [1045, 400], dugmad: [['1', 1], ['P', 0]],
     sprat: sp => ({ naslov: sp ? '1. sprat · galerija i sobe' : 'Prizemlje · sale i saloni', ...jedanStan('francuska', sp ? 'Obilazak sprata' : 'Obilazak prizemlja', 'Rekonstruisano 2017–2021 · 13 prostorija', sp ? [['s01','Galerija sa svetlarnikom'],['s02','Rezbarena galerija'],['s03','Hodnik'],['s04','Svetlarnik'],['s05','Stepenišni prostor'],['s06','Vrh stepeništa'],['s07','Hol na spratu'],['s08','Hodnik sa rasvetom'],['s09','Ograda galerije'],['s10','Prozori ka dvorištu'],['s11','Soba'],['s12','Soba sa gredama'],['s13','Spavaća soba']] : [['p01','Velika sala'],['p02','Sala za sastanke'],['p03','Trpezarija'],['p04','Salon sa lusterom'],['p05','Konferencijska sala'],['p06','Kamin sa ogledalom'],['p07','Mermerni kamin'],['p08','Detalj enterijera'],['p09','Ogledalo u zlatnom ramu'],['p10','Hrastovo stepenište'],['p11','Rezbarena ograda'],['p12','Stepenište ka spratu']]) }),
+    tura: turaSlike
+  },
+  avala: {
+    naziv: 'Avala house', mesto: 'Avala', adresa: 'Avala, Beograd · kuća sa bazenom i pogledom na Avalski toranj',
+    film: 'p/avala/film/film', kraj: 'p/avala/kraj.jpg', w: 1600, h: 900, mobX: 55,
+    fasada: () => [
+      R('Bazen', 244, 660, 555, 861, 'Iza kuće', 'stepenasto korito sa stepenicama, kao u stvarnosti'),
+      R('Pomoćni objekat', 880, 297, 1062, 421, 'Dvorište', 'ostava i garaža'),
+      R('Popločano dvorište', 1062, 380, 1320, 593, 'Ispred kuće', 'sa drvetom, kao danas'),
+      R('Kapija', 1081, 258, 1330, 360, 'Ulaz sa puta', 'kovana kapija sa panelima'),
+      R('Glavni ulaz', 823, 470, 960, 640, 'Kuća', 'kliknite za ulaz')],
+    pin: [775, 540], dugmad: [['1', 1], ['P', 0], ['D', -1]],
+    sprat: sp => sp === -1 ? { naslov: 'Dvorište', ...jedanStan('avala', 'Dvorište i bazen', 'prave fotografije i snimak dronom', [['a1', 'Kapija i ulaz u dvorište'], ['a2', 'Popločano dvorište ispred kuće'], ['a3', 'Pomoćni objekat u dvorištu'], ['a4', 'Kuća sa ulazom'], ['a9', 'Gotova kuća sa bazenom iz vazduha']]) }
+      : sp === 0 ? { naslov: 'Prizemlje', ...jedanStan('avala', 'Dnevni prostor', 'prave prostorije, nameštaj je ilustracija', [['a5', 'Dnevna soba sa izlazom na terasu'], ['a6', 'Kuhinja i trpezarija'], ['a-trpezarija', 'Trpezarija (ilustracija)'], ['a-terasa', 'Terasa (ilustracija)']]) }
+      : { naslov: 'Sprat', ...jedanStan('avala', 'Spavaći deo', 'prave prostorije, nameštaj je ilustracija', [['a7', 'Glavna spavaća soba sa pogledom'], ['a10', 'Druga spavaća soba i radni kutak'], ['a8', 'Kupatilo']]) },
+    tura: turaSlike
+  },
+  sumatovacka: {
+    posle: [['p/sumatovacka/zgrada-render.jpg', 'Zgrada sa crnim kamenim pojasom'], ['p/sumatovacka/stan/bazen.jpg', 'Bazen u dvorištu'], ['p/sumatovacka/kraj.jpg', 'Šumatovačka 155 · Vračar']],
+    naziv: 'Šumatovačka 155', mesto: 'Vračar, Beograd', adresa: 'Vračar, Beograd ·2.264,48 m² · 13 stanova · 12 garaža',
+    film: 'p/sumatovacka/film/film', kraj: 'p/sumatovacka/kraj.jpg', w: 1600, h: 900, mobX: 50,
+    fasada: () => [
+      R('Balkon', 75, 82, 390, 200, '4. sprat', 'staklena ograda'),
+      R('Balkon', 1190, 82, 1525, 200, '4. sprat', 'staklena ograda'),
+      R('Balkon', 75, 205, 390, 335, '3. sprat', 'staklena ograda'),
+      R('Balkon', 1190, 205, 1525, 335, '3. sprat', 'staklena ograda'),
+      R('Terasa', 718, 200, 980, 262, '4. sprat', '≈ 6,5 × 1,6 m · staklena ograda'),
+      R('Terasa', 718, 318, 980, 385, '3. sprat', '≈ 6,5 × 1,6 m · staklena ograda'),
+      R('Terasa', 718, 438, 980, 500, '2. sprat', '≈ 6,5 × 1,6 m · staklena ograda'),
+      R('Terasa', 718, 555, 980, 625, '1. sprat', '≈ 6,5 × 1,6 m · staklena ograda'),
+      R('Prozor', 585, 180, 682, 232, '4. sprat', '≈ 1,6 × 0,9 m'),
+      R('Prozor', 585, 300, 682, 352, '3. sprat', '≈ 1,6 × 0,9 m'),
+      R('Prozor', 585, 420, 682, 472, '2. sprat', '≈ 1,6 × 0,9 m'),
+      R('Prozor', 585, 540, 682, 592, '1. sprat', '≈ 1,6 × 0,9 m'),
+      R('Crni kameni pojas', 785, 105, 822, 660, 'Fasada', 'crni kamen, kao na pravoj zgradi'),
+      R('Glavni ulaz', 790, 665, 862, 815, 'Prizemlje', 'ulaz u zgradu · kliknite za ulaz'),
+      R('Garaža', 20, 690, 235, 840, 'Prizemlje', 'ulaz u garažu · 12 garažnih mesta'),
+      R('Garaža', 1130, 690, 1505, 812, 'Prizemlje', 'garažna vrata')],
+    pin: [826, 760], dugmad: [['4', 4], ['3', 3], ['2', 2], ['1', 1], ['P', 0], ['-1', -1]],
+    sprat: sp => sp === -1
+      ? { naslov: 'Podzemna garaža', ...jedanStan('sumatovacka', 'Garaža', '12 garažnih mesta · Šumatovačka 155', [['garaza', 'Garaža zgrade']]) }
+      : sp === 0
+        ? { naslov: 'Prizemlje · zajednički sadržaji', ...jedanStan('sumatovacka', 'Bazen i teretana', 'Sadržaji zgrade · Šumatovačka 155', [['zgrada-stvarna-cela', 'Prava zgrada danas · fotografija'], ['bazen', 'Bazen u dvorištu'], ['fitnes', 'Teretana']]) }
+        : { naslov: sp + '. sprat · stanovi', stanovi: [{ id: '85', naziv: 'Stan 85 m²', opis: 'primer stana · 13 stanova u zgradi', slike: [['p/sumatovacka/stan/s85-dnevna.jpg', 'Dnevna i trpezarija (ilustracija)'], ['p/sumatovacka/stan/s85-kuhinja.jpg', 'Kuhinja (ilustracija)'], ['p/sumatovacka/stan/s85-spavaca-1.jpg', 'Glavna spavaća soba (ilustracija)'], ['p/sumatovacka/stan/s85-spavaca-2.jpg', 'Druga spavaća soba (ilustracija)'], ['p/sumatovacka/stan/s85-kupatilo.jpg', 'Kupatilo (ilustracija)'], ['p/sumatovacka/stan/s85-terasa.jpg', 'Terasa (ilustracija)']] }, { id: '90', naziv: 'Stan 90 m²', opis: 'primer stana · 13 stanova u zgradi', slike: [['p/sumatovacka/stan/s90-dnevna.jpg', 'Dnevna (ilustracija)'], ['p/sumatovacka/stan/s90-kuhinja.jpg', 'Kuhinja (ilustracija)'], ['p/sumatovacka/stan/s90-spavaca-1.jpg', 'Glavna spavaća soba (ilustracija)'], ['p/sumatovacka/stan/s90-spavaca-2.jpg', 'Druga spavaća soba (ilustracija)'], ['p/sumatovacka/stan/s90-kupatilo.jpg', 'Kupatilo (ilustracija)'], ['p/sumatovacka/stan/s90-terasa.jpg', 'Terasa (ilustracija)']] }] },
+    tura: turaSlike
+  },
+  kursumlijska: {
+    naziv: 'Kuršumlijska 3', mesto: 'Senjak', adresa: 'Kuršumlijska 3, Senjak, Beograd · 406 m² · 4 stana · bazen 14 m',
+    film: 'p/kursumlijska/film/film', kraj: 'p/kursumlijska/kraj.jpg', w: 1600, h: 900, mobX: 50,
+    fasada: () => [
+      R('Stanovi', 650, 20, 1065, 545, 'Zgrada', '4 stana · ukupno 406 m²'),
+      R('Terasa', 380, 215, 610, 520, 'Sprat', 'terasa sa ogradom'),
+      R('Parking', 350, 650, 600, 800, 'Dvorište', 'parking iza rampe'),
+      R('Glavni ulaz', 655, 560, 775, 740, 'Zgrada', 'kliknite za ulaz')],
+    pin: [750, 600], dugmad: [['1', 1], ['P', 0], ['D', -1]],
+    sprat: sp => sp === -1 ? { naslov: 'Dvorište', ...jedanStan('kursumlijska', 'Bazen i hortikultura', 'prave fotografije · bazen 14 m', [['k1', 'Bazen sa vodopadom'], ['k2', 'Bazen'], ['k3', 'Hortikultura i atrijum']]) }
+      : sp === 0 ? { naslov: 'Dnevni prostor', ...jedanStan('kursumlijska', 'Dnevni prostor', 'prave fotografije', [['k4', 'Dnevna soba'], ['k5', 'Dnevna soba i trpezarija'], ['k6', 'Kuhinja'], ['k7', 'Svetao dnevni prostor']]) }
+      : { naslov: 'Spavaći deo', ...jedanStan('kursumlijska', 'Spavaći deo', 'prave fotografije', [['k8', 'Spavaća soba'], ['k9', 'Spavaća soba sa izlazom'], ['k10', 'Kupatilo'], ['k11', 'Kuhinja']]) },
     tura: turaSlike
   }
 };
