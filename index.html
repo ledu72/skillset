@@ -7,7 +7,7 @@
 <meta name="description" content="MASSIV ressidence na Zlatiboru: apart hotel sa 4 zvezde i 52 stana. Pogledajte lokaciju, gradnju i stanove u ponudi kompanije Skillset.">
 <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=switzer@400,500,600&display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400&display=swap">
-<link rel="stylesheet" href="style.css?v=1793300000">
+<link rel="stylesheet" href="style.css?v=1793300018">
 </head>
 <body>
 
@@ -34,10 +34,12 @@
 
   <!-- 1. Karta Srbije -->
   <section class="scene scene-srbija" aria-label="Mapa Srbije">
+    <div class="soba" aria-hidden="true"></div>
+    <div class="holo-zrak" aria-hidden="true"></div>
     <div class="svg-wrap" id="srbija"></div>
     <div class="intro">
       <p class="mono">Skillset · lokacije</p>
-      <h1>Izaberite<br>gde živite.</h1>
+      <h1>Izaberite <br>gde živite.</h1>
       <p class="lead">Kliknite na lokaciju na mapi.</p>
       <ul class="loc-list" id="locList"></ul>
     </div>
@@ -47,7 +49,7 @@
   <section class="scene scene-film" aria-label="Let do parcele i gradnja">
     <canvas id="film"></canvas>
     <div class="posle" id="posle" hidden><div class="posle-slike"></div><div class="posle-hud"><p class="mono">Danas · <span id="posleBroj"></span></p><h2 id="posleNaslov"></h2></div><p class="mono posle-hint">Skrolujte ↓ do zgrade · ↑ nazad na gradnju</p></div>
-    <div class="uvod" hidden><video id="uvod" muted loop playsinline preload="none" aria-label="Zgrada iz svih uglova"></video><p class="mono uvod-hint">Zgrada iz svih uglova · skrolujte ↓ da vidite gradnju</p></div>
+    <div class="uvod" hidden><video id="uvod" muted loop playsinline preload="none" aria-label="Zgrada iz svih uglova"></video><div class="uvod-slike" id="uvodSlike"></div><p class="mono uvod-hint" id="uvodHint"></p></div>
     <div class="shade"></div>
     <div class="hud">
       <p class="mono" id="filmNaslov">MASSIV ressidence · Zlatibor, Bele vode</p>
@@ -110,7 +112,7 @@
   </section>
 </main>
 
-<script src="projekti.js?v=1793300000"></script>
-<script src="app.js?v=1793300000"></script>
+<script src="projekti.js?v=1793300015"></script>
+<script src="app.js?v=1793300020"></script>
 </body>
 </html>

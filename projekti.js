@@ -132,7 +132,7 @@ const PROJEKTI = {
     tura: s => s.slike ? turaSlike(s) : ({ slike: [[`p/lestane/stan/dnevna-${s.t.k}.jpg`, 'Dnevni boravak'], ['p/lestane/stan/l-kuhinja.jpg', 'Kuhinja (ilustracija)'], [`p/lestane/stan/spavaca-${s.t.k}.jpg`, 'Spavaća soba (ilustracija)'], ...(s.t.tip === 'Dvosoban' ? [] : [['p/lestane/stan/l-soba2.jpg', 'Druga soba (ilustracija)']]), ['p/lestane/stan/l-kupatilo.jpg', 'Kupatilo (ilustracija)']], info: `${s.t.tip} · ${m2f(s.t.m2)} m² neto` })
   },
   visnjica: {
-    posle: [['p/visnjica/gal/g1.jpg','Pogled iz ulice'],['p/visnjica/gal/g2.jpg','Ugao zgrade'],['p/visnjica/gal/g3.jpg','Fasada sa terasama'],['p/visnjica/kraj.jpg','Višnjica Residence']],   // slike posle gradnje, pre fasade
+    posle: [['p/visnjica/gal/g1.jpg','Pogled iz ulice'],['p/visnjica/gal/g2.jpg','Ugao zgrade']],   // slike posle gradnje, pre fasade
     naziv: 'Višnjica Residence', mesto: 'Višnjica', adresa: 'Ramadanska ulica, Višnjica · Palilula',
     film: 'p/visnjica/film/film',
     kraj: 'p/visnjica/kraj.jpg', w: 1760, h: 983, mobX: 39,
@@ -145,7 +145,7 @@ const PROJEKTI = {
     tura: s => s.slike ? turaSlike(s) : ({ slike: V_TURA[s.tip].filter(([f]) => f !== '3d').map(([f, n]) => [V_NOVE.has(+s.id) ? `p/visnjica/stan/n${s.id}-${f}.jpg` : `p/visnjica/stan/${f}.jpg`, n]), info: `${s.tip} · ${m2f(s.m2)} m² neto` })
   },
   kopaonik: {
-    posle: [['p/kopaonik/gal/g1.jpg','Pogled sa puta'],['p/kopaonik/gal/g2.jpg','Zgrada u šumi'],['p/kopaonik/gal/g4.jpg','Fasada sa terasama'],['p/kopaonik/gal/g5.jpg','Bočni pogled'],['p/kopaonik/kraj.jpg','MASSIV Kopaonik']],   // slike posle gradnje, pre fasade
+    posle: [['p/kopaonik/gal/g1.jpg','Pogled sa puta'],['p/kopaonik/gal/g4.jpg','Fasada sa terasama'],['p/kopaonik/kraj.jpg','MASSIV Kopaonik']],   // slike posle gradnje, pre fasade
     naziv: 'MASSIV Kopaonik', mesto: 'Kopaonik', adresa: 'Kopaonik · apart hotel 4*, vikend naselje',
     film: 'p/kopaonik/film/film', kraj: 'p/kopaonik/kraj.jpg', w: 1600, h: 900, mobX: 52,
     fasada: () => [
@@ -228,7 +228,6 @@ const PROJEKTI = {
     tura: turaSlike
   },
   francuska: {
-    posle: [['p/francuska/stan/p01.jpg','Obnovljeni podovi i zidovi'],['p/francuska/stan/p02.jpg','Galerija sa ogradom'],['p/francuska/stan/p03.jpg','Svečana sala'],['p/francuska/stan/p04.jpg','Obnovljeni enterijer'],['p/francuska/kraj.jpg','Francuska 21']],   // slike posle gradnje, pre fasade
     naziv: 'Spomen dom Nikole Pašića', mesto: 'Beograd', adresa: 'Francuska 21, Beograd · rekonstrukcija 2017–2021',
     film: 'p/francuska/film/film', kraj: 'p/francuska/kraj.jpg', w: 1600, h: 900, mobX: 50,
     fasada: () => [
