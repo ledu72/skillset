@@ -14,3 +14,8 @@ sa-starog-sajta
 _render-mapa.js
 
 p/*/za-ai
+p/pocetna/za-ai
+p/*/za-ai
+p/sumatovacka/stan/g[0-9]*
+p/kursumlijska/stan/g[0-9]*
+p/kopaonik/stan/g[0-9]*
