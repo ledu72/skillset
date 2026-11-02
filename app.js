@@ -323,7 +323,8 @@ $('liftStanovi').addEventListener('click', ev => {
   setTimeout(() => { vrata.classList.remove('open'); uStan(s); }, 1100);
 });
 document.querySelector('[data-zgrada]').addEventListener('click', uZgradu);
-document.querySelector('[data-lift]').addEventListener('click', pokaziLift);
+const nazadULift = () => scena('lift', `${P.naziv} → Lift`);   // izlaz iz stana: lift ostaje na istom spratu, sa listom stanova
+document.querySelector('[data-lift]').addEventListener('click', nazadULift);
 document.querySelector('[data-home]').addEventListener('click', e => {
   e.preventDefault(); stage.classList.remove('zooming'); svg?.setAttribute('viewBox', '0 0 1600 2108'); scena('srbija', 'Srbija');
   history.replaceState(null, '', location.pathname);
@@ -376,7 +377,7 @@ function pomeri(d) {
     if (d < 0 && F.film.N) { scena('film', `Srbija → ${P.mesto}`); F.film.crtaj(); if (P.uvod && P.posle?.length) { posle(true); POSLE.q = POSLE.cilj = 1; POSLE.crtaj(); } }   // nadole nema dalje: u zgradu se ulazi klikom na vrata
   } else if (s === 'stan') {
     const st = F.stan;
-    if (st.target <= 0 && d < 0) { if (now - lock > 700) { lock = now; pokaziLift(); } return; }
+    if (st.target <= 0 && d < 0) { if (now - lock > 700) { lock = now; nazadULift(); } return; }
     st.idi(st.target + d * (TURA.klip ? .9 : 2.4 / Math.max(1, TURA.slike.length - 1)));
   }
 }
