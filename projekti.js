@@ -106,7 +106,8 @@ const SUM_A = [R_DN, R_KU, R_SP, R_KP, R_TE], SUM_B = [['dnevna', 'Dnevna soba']
 const SUMA = n => PL('sumatovacka', n === 2 ? 'sA' : 'sB', 'Stan ' + n, n === 2 ? 'Dvosoban · 47,26 m² + terasa 9,68 m² · po nacrtu' : 'Garsonjera · 32,72 m² + terasa 1,19 m² · po nacrtu', n === 2 ? SUM_A : SUM_B);
 // stanovi 4-11: terasa po spratu, od 6 navise i svoja dnevna i kuhinja
 const SUMV = (n, st) => ({ ...st, slike: st.slike.map(([u, o]) => { const r = u.match(/-(dnevna|kuhinja|terasa)\.jpg$/); return r && (n > 5 || r[1] === 'terasa') ? ['p/sumatovacka/stan/v' + n + '-' + r[1] + '.jpg', o] : [u, o]; }) });
-const SUMS = n => SUMV(n, n % 2 ? PL('sumatovacka', 'sD', 'Stan ' + n, 'Trosoban · 75,62 m² + terasa 9,42 m² · po nacrtu', SUM_D) : PL('sumatovacka', 'sC', 'Stan ' + n, 'Troiposoban · 76,52 m² + terasa 11,75 m² · po nacrtu', SUM_C));
+const SUM_PS = { 12: '71,57 m² + terasa 18,54 m²', 13: '67,99 m² + terasa 16,90 m²' };
+const SUMS = n => SUMV(n, n % 2 || n > 11 ? PL('sumatovacka', 'sD', 'Stan ' + n, 'Trosoban · ' + (SUM_PS[n] || '75,62 m² + terasa 9,42 m²') + ' · po nacrtu', SUM_D) : PL('sumatovacka', 'sC', 'Stan ' + n, 'Troiposoban · 76,52 m² + terasa 11,75 m² · po nacrtu', SUM_C));
 const turaSlike = s => ({ slike: s.slike, info: s.opis });
 // galerija zgrade (fotografije i renderi) kao "stan" u liftu
 const galerija = (dir, naslov, opis, imena) => ({ naslov, stanovi: [{ id: 'gal', naziv: 'Galerija zgrade', opis, slike: imena.map((n, i) => ['p/' + dir + '/gal/g' + (i + 1) + '.jpg', n]) }] });
@@ -286,12 +287,12 @@ const PROJEKTI = {
       R('Glavni ulaz', 790, 665, 862, 815, 'Prizemlje', 'ulaz u zgradu · kliknite za ulaz'),
       R('Garaža', 20, 690, 235, 840, 'Prizemlje', 'ulaz u garažu · 12 garažnih mesta'),
       R('Garaža', 1130, 690, 1505, 812, 'Prizemlje', 'garažna vrata')],
-    pin: [826, 760], dugmad: [['4', 4], ['3', 3], ['2', 2], ['1', 1], ['P', 0], ['-1', -1]],
+    pin: [826, 760], dugmad: [['PS', 5], ['4', 4], ['3', 3], ['2', 2], ['1', 1], ['P', 0], ['-1', -1]],
     sprat: sp => sp === -1
       ? { naslov: 'Podzemna garaža', ...jedanStan('sumatovacka', 'Garaža', '12 garažnih mesta · Šumatovačka 155', [['garaza', 'Garaža zgrade']]) }
       : sp === 0
         ? { naslov: 'Prizemlje · zajednički sadržaji', ...jedanStan('sumatovacka', 'Bazen i teretana', 'Sadržaji zgrade · Šumatovačka 155', [['zgrada-stvarna-cela', 'Prava zgrada danas · fotografija'], ['bazen', 'Bazen u dvorištu'], ['fitnes', 'Teretana']]), stanovi: [...jedanStan('sumatovacka', 'Bazen i teretana', 'Sadržaji zgrade · Šumatovačka 155', [['zgrada-stvarna-cela', 'Prava zgrada danas · fotografija'], ['bazen', 'Bazen u dvorištu'], ['fitnes', 'Teretana']]).stanovi, SUMA(2), SUMA(3)] }
-        : { naslov: sp + '. sprat · stanovi', stanovi: { 1: [4, 5], 2: [6, 7], 3: [8, 9], 4: [10, 11] }[sp].map(SUMS) },
+        : { naslov: (sp === 5 ? 'Povučeni sprat' : sp + '. sprat') + ' · stanovi', stanovi: { 1: [4, 5], 2: [6, 7], 3: [8, 9], 4: [10, 11], 5: [12, 13] }[sp].map(SUMS) },
     tura: turaSlike
   },
   kursumlijska: {
