@@ -104,7 +104,9 @@ const SUM_A = [R_DN, R_KU, R_SP, R_KP, R_TE], SUM_B = [['dnevna', 'Dnevna soba']
   SUM_C = [['dnevna', 'Dnevna soba sa trpezarijom'], R_KU, ['spavaca', 'Spavaća soba (2 osobe)'], ['soba1', 'Soba (1 osoba)'], ['soba2', 'Soba (1 osoba)'], R_KP, R_TE],
   SUM_D = [['dnevna', 'Dnevna soba sa trpezarijom'], R_KU, ['spavaca1', 'Spavaća soba (2 osobe)'], ['spavaca2', 'Spavaća soba (2 osobe)'], R_KP, R_TE];
 const SUMA = n => PL('sumatovacka', n === 2 ? 'sA' : 'sB', 'Stan ' + n, n === 2 ? 'Dvosoban · 47,26 m² + terasa 9,68 m² · po nacrtu' : 'Garsonjera · 32,72 m² + terasa 1,19 m² · po nacrtu', n === 2 ? SUM_A : SUM_B);
-const SUMS = n => n % 2 ? PL('sumatovacka', 'sD', 'Stan ' + n, 'Trosoban · 75,62 m² + terasa 9,42 m² · po nacrtu', SUM_D) : PL('sumatovacka', 'sC', 'Stan ' + n, 'Troiposoban · 76,52 m² + terasa 11,75 m² · po nacrtu', SUM_C);
+// stanovi 4-11: terasa po spratu, od 6 navise i svoja dnevna i kuhinja
+const SUMV = (n, st) => ({ ...st, slike: st.slike.map(([u, o]) => { const r = u.match(/-(dnevna|kuhinja|terasa)\.jpg$/); return r && (n > 5 || r[1] === 'terasa') ? ['p/sumatovacka/stan/v' + n + '-' + r[1] + '.jpg', o] : [u, o]; }) });
+const SUMS = n => SUMV(n, n % 2 ? PL('sumatovacka', 'sD', 'Stan ' + n, 'Trosoban · 75,62 m² + terasa 9,42 m² · po nacrtu', SUM_D) : PL('sumatovacka', 'sC', 'Stan ' + n, 'Troiposoban · 76,52 m² + terasa 11,75 m² · po nacrtu', SUM_C));
 const turaSlike = s => ({ slike: s.slike, info: s.opis });
 // galerija zgrade (fotografije i renderi) kao "stan" u liftu
 const galerija = (dir, naslov, opis, imena) => ({ naslov, stanovi: [{ id: 'gal', naziv: 'Galerija zgrade', opis, slike: imena.map((n, i) => ['p/' + dir + '/gal/g' + (i + 1) + '.jpg', n]) }] });
